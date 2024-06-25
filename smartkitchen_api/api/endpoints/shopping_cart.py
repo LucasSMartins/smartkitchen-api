@@ -2,7 +2,15 @@ from decimal import ROUND_DOWN, Decimal, getcontext
 from typing import Annotated
 
 from bson import ObjectId
-from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
+from fastapi import (
+    APIRouter,
+    Body,
+    Depends,
+    HTTPException,
+    Path,
+    Query,
+    status,
+)
 
 from smartkitchen_api.api.schema.default_answer import DefaultAnswer, StatusMsg
 from smartkitchen_api.api.schema.shopping_cart import (
@@ -57,7 +65,7 @@ async def read_shopping_cart(user_id: str = Depends(validate_object_id)):
 async def create_cart_item(
     category_value: Annotated[
         CategoryValue,
-        Query(
+        Path(
             description='List of food category values, '
             'is a 3-digit integer value',
         ),
@@ -212,7 +220,7 @@ async def all_items_specific_category(
 )
 async def delete_item(
     item_id: Annotated[
-        str, Query(description='Unique ID of the shopping cart item')
+        str, Path(description='Unique ID of the shopping cart item')
     ],
     category_value: Annotated[
         CategoryValue,
@@ -266,18 +274,18 @@ async def delete_item(
 )
 async def updates_shopping_cart_item(
     item_id: Annotated[
-        str, Query(description='Unique ID of the shopping cart item')
+        str, Path(description='Unique ID of the shopping cart item')
     ],
     category_value: Annotated[
         CategoryValue,
-        Query(
+        Path(
             description='List of food category values, '
             'is a 3-digit integer value'
         ),
     ],
     data_items_update: Annotated[
         ItemsIn,
-        Query(
+        Body(
             description='Item data that will be inserted '
             'into the shopping cart'
         ),
