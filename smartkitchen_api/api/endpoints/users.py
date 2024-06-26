@@ -33,11 +33,11 @@ async def read_users():
     )
 
     if not data:
-        response = DefaultAnswer(
-            status=StatusMsg.FAIL, msg='Users not found'
-        ).model_dump()
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=response
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=DefaultAnswer(
+                status=StatusMsg.FAIL, msg='Users not found'
+            ).model_dump(),
         )
 
     return DefaultAnswer(
@@ -75,7 +75,6 @@ async def create_user(new_user: UserIn):
 
     filter_document_username = {'username': data_user['username']}
     filter_document_email = {'email': data_user['email']}
-
     request_attribute = {'_id': 0, 'password': 0}
 
     does_the_username_exist = await collection_repository.find_document(
@@ -86,28 +85,17 @@ async def create_user(new_user: UserIn):
         filter_document_email, request_attribute
     )
 
-    if does_the_email_exist and does_the_username_exist:
-        response = DefaultAnswer(
-            status=StatusMsg.FAIL, msg='username and email already exists'
-        ).model_dump()
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail=response
+    if does_the_email_exist or does_the_username_exist:
+        msg = (
+            'username and email already exists'
+            if does_the_email_exist and does_the_username_exist
+            else 'username already exists'
+            if does_the_username_exist
+            else 'This email already exists'
         )
-
-    if does_the_username_exist:
-        response = DefaultAnswer(
-            status=StatusMsg.FAIL, msg='username already exists'
-        ).model_dump()
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail=response
-        )
-
-    if does_the_email_exist:
-        response = DefaultAnswer(
-            status=StatusMsg.FAIL, msg='This email already exists'
-        ).model_dump()
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail=response
+            status_code=status.HTTP_409_CONFLICT,
+            detail=DefaultAnswer(status=StatusMsg.FAIL, msg=msg).model_dump(),
         )
 
     insert_one_result = await collection_repository.insert_document(data_user)
@@ -118,7 +106,10 @@ async def create_user(new_user: UserIn):
         ).model_dump()
     ]
 
-    # TODO: As criações de categorias e carrinho de compras precisão ser somente chamadas se o usuário for criado ? precisa haver algum tipo de validação para elas serem chamadas ?  # noqa: E501
+    # TODO: As criações de categorias e carrinho de compras
+    #  precisão ser somente chamadas se o usuário for criado ?
+    #  precisa haver algum tipo de validação para elas
+    #  serem chamadas ?
     await create_categories(
         user_id=insert_one_result.inserted_id, username=data_user['username']
     )
@@ -136,7 +127,9 @@ async def create_user(new_user: UserIn):
     '/{user_id}', response_model=DefaultAnswer, status_code=status.HTTP_200_OK
 )
 async def del_document(user_id: str = Depends(validate_object_id)):
-    # TODO Devo chamar uma função aqui também que deleta o DB pantry do usuário porque e se ele quiser voltar a usar o App?  # noqa: E501
+    # TODO Devo chamar uma função aqui também que deleta o DB
+    #  pantry do usuário porque e se ele quiser voltar
+    #  a usar o App?
 
     filter_document = {'_id': ObjectId(user_id)}
 
@@ -182,28 +175,32 @@ async def update_document(
         )
 
     # Verifica se o username já está em uso
-    if data_user_update.username:
-        if await collection_repository.find_document_one({
+    if (
+        data_user_update.username
+        and await collection_repository.find_document_one({
             'username': data_user_update.username
-        }):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=DefaultAnswer(
-                    status=StatusMsg.FAIL, msg='Username already in use'
-                ).model_dump(),
-            )
+        })
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=DefaultAnswer(
+                status=StatusMsg.FAIL, msg='Username already in use'
+            ).model_dump(),
+        )
 
     # Verifica se o email já está em uso
-    if data_user_update.email:
-        if await collection_repository.find_document_one({
+    if (
+        data_user_update.email
+        and await collection_repository.find_document_one({
             'email': data_user_update.email
-        }):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=DefaultAnswer(
-                    status=StatusMsg.FAIL, msg='Email already in use'
-                ).model_dump(),
-            )
+        })
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=DefaultAnswer(
+                status=StatusMsg.FAIL, msg='Email already in use'
+            ).model_dump(),
+        )
 
     # Removendo os attr com valores None
     request_attribute = {
