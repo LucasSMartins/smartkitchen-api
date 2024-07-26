@@ -11,6 +11,8 @@ fastapi = "^0.111.0"
 motor = "^3.4.0"
 pydantic-mongo = "^2.3.0"
 beanie = "^1.26.0"
+pydantic-settings = "^2.3.4"
+pwdlib = {extras = ["argon2"], version = "^0.2.0"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
@@ -21,7 +23,7 @@ pytest-asyncio = "^0.23.7"
 commitizen = "^3.27.0"
 
 [tool.ruff]
-line-length = 79
+# line-length = 79
 # extend-exclude = ['migrations']
 
 [tool.ruff.lint]
@@ -39,9 +41,9 @@ addopts = '-p no:warnings'
 [tool.taskipy.tasks]
 lint = 'ruff check . && ruff check . --diff'
 format = 'ruff check . --fix && ruff format .'
-run = 'fastapi dev smartkitchen_api/app.py'
+run = 'fastapi dev smartkitchen_api/main.py'
 pre_test = 'task lint'
-test = 'pytest -s -x --cov=smartkitchen_api -vv'  # O -x no pytest faz com que o teste pare no primeiro error.
+test = 'pytest -s -x --cov=tests -vv'          # O -x no pytest faz com que o teste pare no primeiro error.
 post_test = 'coverage html'
 
 [build-system]

@@ -11,9 +11,7 @@ class CollectionHandler:
     async def find_document(
         self, filter_document: Dict = {}, request_attribute: Dict = {}
     ):
-        collection = self.__db_connection.get_collection(
-            self.__collection_name
-        )
+        collection = self.__db_connection.get_collection(self.__collection_name)
         async_cursor = collection.find(filter_document, request_attribute)
         data = await async_cursor.to_list(length=None)
         return data
@@ -21,18 +19,14 @@ class CollectionHandler:
     async def find_document_one(
         self, filter_document: Dict = {}, request_attribute: Dict = {}
     ):
-        collection = self.__db_connection.get_collection(
-            self.__collection_name
-        )
+        collection = self.__db_connection.get_collection(self.__collection_name)
         data = await collection.find_one(filter_document, request_attribute)
         if data:
             data = [data]
         return data
 
     async def insert_document(self, document: Dict):
-        collection = self.__db_connection.get_collection(
-            self.__collection_name
-        )
+        collection = self.__db_connection.get_collection(self.__collection_name)
         insert_result = await collection.insert_one(document)
         return insert_result
 
@@ -47,25 +41,19 @@ class CollectionHandler:
         request_attribute: Dict,
         array_filters: list[Dict] = None,
     ) -> UpdateResult:
-        collection = self.__db_connection.get_collection(
-            self.__collection_name
-        )
+        collection = self.__db_connection.get_collection(self.__collection_name)
         update_result: UpdateResult = await collection.update_one(
             filter_document, request_attribute, array_filters=array_filters
         )
         return update_result
 
     def delete_document(self, _id: Dict):
-        collection = self.__db_connection.get_collection(
-            self.__collection_name
-        )
+        collection = self.__db_connection.get_collection(self.__collection_name)
         delete_result = collection.delete_one(_id)
         return delete_result
 
     def delete_many(self):
-        collection = self.__db_connection.get_collection(
-            self.__collection_name
-        )
+        collection = self.__db_connection.get_collection(self.__collection_name)
         collection.delete_many({})
 
     # def delete_many_document(self, userId: List) -> None:

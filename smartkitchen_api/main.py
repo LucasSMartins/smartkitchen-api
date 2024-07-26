@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 
 from smartkitchen_api.api.router import api_router
+from smartkitchen_api.database.database import init_db
 
 app = FastAPI(
     title='smart kitchen',
@@ -11,6 +12,12 @@ app = FastAPI(
 )
 
 app.include_router(api_router, prefix='/api')
+
+
+@app.on_event('startup')
+async def start_db():
+    await init_db()
+
 
 origins = ['*']
 

@@ -19,9 +19,7 @@ class UserIn(BaseModel):
                 'The password should contain at least one lowercase letter'
             )
         if not re_search(r'[!@#$%^&*(),.?":{}|<>]', value):
-            raise ValueError(
-                'The password must contain at least one special character'
-            )
+            raise ValueError('The password must contain at least one special character')
         if not re_search(r'[0-9]', value):
             raise ValueError('The password must contain at least one number')
 
