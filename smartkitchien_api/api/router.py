@@ -8,7 +8,7 @@ from fastapi import APIRouter
 #     router as shopping_cart_router,
 # )
 # from smartkitchen_api.api.endpoints.recipes import router as recipes_router
-from smartkitchen_api.api.endpoints.users import router as users_router
+from smartkitchien_api.api.endpoints.users import router as users_router
 
 api_router = APIRouter()
 

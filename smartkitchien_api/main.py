@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 
-from smartkitchen_api.api.router import api_router
-from smartkitchen_api.database.database import init_db
+from smartkitchien_api.api.router import api_router
+from smartkitchien_api.database.database import init_db
 
 app = FastAPI(
     title='smart kitchen',

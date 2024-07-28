@@ -1,9 +1,9 @@
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from smartkitchen_api.config.settings import setting
-from smartkitchen_api.models.pantry import Pantry
-from smartkitchen_api.models.user import User
+from smartkitchien_api.config.settings import setting
+from smartkitchien_api.models.pantry import Pantry
+from smartkitchien_api.models.user import User
 
 
 async def init_db():

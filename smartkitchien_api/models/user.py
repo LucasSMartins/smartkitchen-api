@@ -3,7 +3,7 @@ from re import search as re_search
 
 from beanie import Document
 from pwdlib import PasswordHash
-from pydantic import EmailStr, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 pwd_context = PasswordHash.recommended()
 
@@ -12,7 +12,7 @@ class User(Document):
     username: str = Field(..., min_length=5, max_length=15)
     email: EmailStr
     password: str = Field(..., min_length=8)
-    created_at: datetime = Field(default_factory=lambda: datetime.now().isoformat())
+    created_at: str = Field(default_factory=lambda: datetime.now().isoformat())
 
     @field_validator('email')
     def lowercase_email(cls, value: EmailStr) -> EmailStr:
@@ -44,3 +44,15 @@ class UpdateUser(User):
     username: str | None = None
     email: EmailStr | None = None
     password: datetime | None = None
+
+
+class UserPublic(BaseModel):
+    username: str
+    email: EmailStr
+    created_at: str
+
+    @field_validator('created_at')
+    def iso_to_human_readable(cls, value: EmailStr) -> EmailStr:
+        dt = datetime.fromisoformat(value)
+        human_readable_str = dt.strftime('%d/%m/%Y %H:%M:%S')
+        return human_readable_str

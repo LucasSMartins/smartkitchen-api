@@ -1,6 +1,5 @@
 from beanie import PydanticObjectId
 from beanie.operators import Or, Set
-from bson import ObjectId
 from fastapi import (
     APIRouter,
     HTTPException,
@@ -24,8 +23,7 @@ from fastapi import (
 #     mongo_db_infos,
 # )
 # from smartkitchen_api.models.open_connection import open_connection
-from smartkitchen_api.models.pantry import Categories, Pantry, pantry_data
-from smartkitchen_api.models.user import UpdateUser, User
+from smartkitchien_api.models.user import UpdateUser, User, UserPublic
 
 router = APIRouter()
 
@@ -34,7 +32,7 @@ router = APIRouter()
 # )
 
 
-@router.post('/', status_code=status.HTTP_201_CREATED, response_model=User)
+@router.post('/', status_code=status.HTTP_201_CREATED, response_model=UserPublic)
 async def create_new_user(user: User):
     username_exist = await user.find(
         Or(
@@ -57,15 +55,7 @@ async def create_new_user(user: User):
 
     await user.insert()
 
-    user_pantry = Pantry(
-        user_id=ObjectId(user.id),
-        username=user.username,
-        pantry=[Categories(**cat) for cat in pantry_data],
-    )
-
-    await user_pantry.insert()
-
-    return user
+    return UserPublic(**user.model_dump())
 
 
 @router.put('/', status_code=status.HTTP_200_OK, response_model=User)
