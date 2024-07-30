@@ -42,7 +42,7 @@ async def read_root():
             <p>Welcome to SmartKitchen!</p>
             <p>
               <a href="
-                https://crispy-journey-596qqp77rgq34gq5-8000.app.github.dev/docs
+                http://127.0.0.1:8000/docs
                 ">Click here
               </a> for more information about the documentation.
             </p>
