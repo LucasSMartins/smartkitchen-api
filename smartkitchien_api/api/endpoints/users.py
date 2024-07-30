@@ -1,10 +1,11 @@
-from typing import List
+from typing import Annotated, List
 
 from beanie import PydanticObjectId
 from beanie.operators import Or, Set
-from fastapi import APIRouter, Body, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 
 from smartkitchien_api.models.user import User, UserPublic, UserUpdate, user_example
+from smartkitchien_api.security.security import get_current_user
 
 router = APIRouter()
 
@@ -23,8 +24,13 @@ async def read_users():
 
 
 @router.get('/{user_id}', status_code=status.HTTP_200_OK, response_model=UserPublic)
-async def read_user(user_id: PydanticObjectId):
+async def read_user(
+    user_id: PydanticObjectId,
+    current_user: Annotated[User, Depends(get_current_user)],
+):
     user = await User.get(user_id)
+
+    print(current_user)
 
     if not user:
         raise HTTPException(
@@ -150,4 +156,4 @@ async def delete_user(user_id: PydanticObjectId):
 #             ).model_dump(),
 #         )
 
-#     return DefaultAnswer(status=StatusMsg.SUCCESS, msg='User found', data=data)
+# return DefaultAnswer(status=StatusMsg.SUCCESS, msg='User found', data=data)

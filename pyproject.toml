@@ -13,6 +13,8 @@ pydantic-mongo = "^2.3.0"
 beanie = "^1.26.0"
 pydantic-settings = "^2.3.4"
 pwdlib = { extras = ["argon2"], version = "^0.2.0" }
+pyjwt = "^2.8.0"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
