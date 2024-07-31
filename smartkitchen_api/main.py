@@ -13,6 +13,10 @@ app = FastAPI(
 
 app.include_router(api_router, prefix='/api')
 
+# @app.add_event_handler(event_type=)
+# https://fastapi.tiangolo.com/advanced/testing-events/
+# link para entender melhor os testes
+
 
 @app.on_event('startup')
 async def start_db():
