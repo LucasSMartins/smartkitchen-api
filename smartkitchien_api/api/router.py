@@ -1,21 +1,16 @@
 from fastapi import APIRouter
 
-# from smartkitchen_api.api.endpoints.delete_all_db_DEV import (
-#     router as delete_all_router,
-# )
-# from smartkitchen_api.api.endpoints.pantry import router as pantry_router
-# from smartkitchen_api.api.endpoints.shopping_cart import (
-#     router as shopping_cart_router,
-# )
-# from smartkitchen_api.api.endpoints.recipes import router as recipes_router
-from smartkitchien_api.api.endpoints.users import router as users_router
+from smartkitchien_api.api.endpoints.token.post import router as token_post
+from smartkitchien_api.api.endpoints.users.delete import router as user_delete
+from smartkitchien_api.api.endpoints.users.get import router as users_get
+from smartkitchien_api.api.endpoints.users.post import router as user_post
+from smartkitchien_api.api.endpoints.users.put import router as user_put
 
 api_router = APIRouter()
 
-api_router.include_router(users_router, prefix='/users', tags=['Users'])
-# api_router.include_router(pantry_router, prefix='/pantry', tags=['Pantry'])
-# api_router.include_router(
-# shopping_cart_router, prefix='/shopping_cart', tags=['Shopping Cart']
-# )
-# api_router.include_router(recipes_router, prefix='/recipes', tags=['Recipes'])  # noqa: E501
-# api_router.include_router(delete_all_router, prefix='/delete_all')
+api_router.include_router(user_delete, prefix='/users', tags=['Users'])
+api_router.include_router(users_get, prefix='/users', tags=['Users'])
+api_router.include_router(user_post, prefix='/users', tags=['Users'])
+api_router.include_router(user_put, prefix='/users', tags=['Users'])
+
+api_router.include_router(token_post, prefix='/token', tags=['Token'])

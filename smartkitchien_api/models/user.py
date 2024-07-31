@@ -3,10 +3,7 @@ from re import match as re_match
 from re import search as re_search
 
 from beanie import Document
-from pwdlib import PasswordHash
 from pydantic import BaseModel, EmailStr, Field, field_validator
-
-pwd_context = PasswordHash.recommended()
 
 
 class User(Document):
@@ -44,15 +41,10 @@ class User(Document):
         if not re_search(r'[0-9]', password_value):
             raise ValueError('A senha deve conter pelo menos um número')
 
-        return pwd_context.hash(password_value)
+        return password_value
 
     class Settings:
         name = 'users'
-
-
-# def verify_password(plain_password: str, hashed_password: str):
-#     return pwd_context.verify(plain_password, hashed_password)
-# https://polar.sh/frankie567/posts/introducing-pwdlib-a-modern-password-hash-helper-for-python
 
 
 class UserUpdate(BaseModel):
@@ -89,7 +81,7 @@ class UserUpdate(BaseModel):
         if not re_search(r'[0-9]', password_value):
             raise ValueError('A senha deve conter pelo menos um número')
 
-        return pwd_context.hash(password_value)
+        return password_value
 
 
 class UserPublic(BaseModel):

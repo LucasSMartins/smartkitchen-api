@@ -1,84 +1,66 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
-import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from jwt import decode, encode
 from jwt.exceptions import InvalidTokenError
-from passlib.context import CryptContext
+from pwdlib import PasswordHash
 
-from smartkitchien_api.api.schema.token import TokenData
 from smartkitchien_api.config.settings import setting
 from smartkitchien_api.models.user import User
 
-pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+# https://polar.sh/frankie567/posts/introducing-pwdlib-a-modern-password-hash-helper-for-python
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
+pwd_context = PasswordHash.recommended()
 
-
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/token/')
 
 
 def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-async def get_user(username: str):
-    user = await User.find(User.username == username).first_or_none()
-
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail='O usuário não foi encontrado',
-        )
-
-    return user
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
 
 
-async def authenticate_user(username: str, password: str):
-    user = await User.find(User.username == username).first_or_none()
+def create_access_token(payload_data: dict, expires_delta: timedelta | None = None):
+    to_encode = payload_data.copy()
 
-    if not user:
-        return False
-    if not verify_password(password, user.password):
-        return False
-    return user
-
-
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
-    to_encode = data.copy()
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = datetime.now(tz=timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+        expire = datetime.now(tz=timezone.utc) + timedelta(
+            minutes=setting.ACCESS_TOKEN_EXPIRE_MINUTES
+        )
     to_encode.update({'exp': expire})
-    encoded_jwt = jwt.encode(to_encode, setting.SECRET_KEY, algorithm=setting.ALGORITHM)
+
+    encoded_jwt = encode(to_encode, setting.SECRET_KEY, algorithm=setting.ALGORITHM)
+
     return encoded_jwt
 
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail='Could not validate credentials',
+        headers={'WWW-Authenticate': 'Bearer'},
+    )
+
     try:
-        payload = jwt.decode(token, setting.SECRET_KEY, algorithms=[setting.ALGORITHM])
+        payload = decode(token, setting.SECRET_KEY, algorithms=[setting.ALGORITHM])
 
         username: str = payload.get('sub')
 
-        if username is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail='Could not validate credentials',
-                headers={'WWW-Authenticate': 'Bearer'},
-            )
-
-        token_data = TokenData(username=username)
-
+        if not username:
+            raise credentials_exception
     except InvalidTokenError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Could not validate credentials',
-            headers={'WWW-Authenticate': 'Bearer'},
-        )
+        raise credentials_exception
 
-    user = get_user(username=token_data.username)
+    user = await User.find(User.username == username).first_or_none()
+
+    if not user:
+        raise credentials_exception
 
     return user
