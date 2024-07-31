@@ -46,6 +46,7 @@ addopts = '-p no:warnings'
 asyncio_mode = "strict"
 
 
+
 [tool.taskipy.tasks]
 lint = 'ruff check . && ruff check . --diff'
 format = 'ruff check . --fix && ruff format .'
