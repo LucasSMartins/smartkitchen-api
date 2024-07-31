@@ -1,7 +1,7 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.server_api import ServerApi
 
-from smartkitchen_api.models.connection_options.mongo_db_config import (
+from smartkitchien_api.models.connection_options.mongo_db_config import (
     mongo_db_infos,
 )
 

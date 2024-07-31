@@ -1,10 +1,10 @@
-from smartkitchen_api.models.connection_options.connections import (
+from smartkitchien_api.models.connection_options.connections import (
     DBConnectionHandler,
 )
-from smartkitchen_api.models.connection_options.mongo_db_config import (
+from smartkitchien_api.models.connection_options.mongo_db_config import (
     mongo_db_infos,
 )
-from smartkitchen_api.models.repository.collections import CollectionHandler
+from smartkitchien_api.models.repository.collections import CollectionHandler
 
 
 def open_connection(collection):

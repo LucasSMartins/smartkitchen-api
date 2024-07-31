@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 
-from smartkitchen_api.api.router import api_router
-from smartkitchen_api.database.database import init_db
+from smartkitchien_api.api.router import api_router
+from smartkitchien_api.database.database import init_db
 
 app = FastAPI(
     title='smart kitchen',
@@ -46,7 +46,7 @@ async def read_root():
             <p>Welcome to SmartKitchen!</p>
             <p>
               <a href="
-                https://crispy-journey-596qqp77rgq34gq5-8000.app.github.dev/docs
+                http://127.0.0.1:8000/docs
                 ">Click here
               </a> for more information about the documentation.
             </p>

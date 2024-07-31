@@ -3,7 +3,7 @@ from typing import Annotated
 from bson import ObjectId
 from fastapi import HTTPException, Path, status
 
-from smartkitchen_api.api.schema.default_answer import DefaultAnswer, StatusMsg
+from smartkitchien_api.api.schema.default_answer import DefaultAnswer, StatusMsg
 
 """
     TODO: O regex que tem no Path() impede que eu mande

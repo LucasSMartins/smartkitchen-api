@@ -12,7 +12,9 @@ motor = "^3.4.0"
 pydantic-mongo = "^2.3.0"
 beanie = "^1.26.0"
 pydantic-settings = "^2.3.4"
-pwdlib = {extras = ["argon2"], version = "^0.2.0"}
+pwdlib = { extras = ["argon2"], version = "^0.2.0" }
+pyjwt = "^2.8.0"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
@@ -21,6 +23,8 @@ taskipy = "^1.13.0"
 ruff = "^0.4.10"
 pytest-asyncio = "^0.23.7"
 commitizen = "^3.27.0"
+asgi-lifespan = "^2.1.0"
+mongomock = "^4.1.2"
 
 [tool.ruff]
 # line-length = 79
@@ -37,14 +41,17 @@ quote-style = 'single'
 [tool.pytest.ini_options]
 pythonpath = "."
 addopts = '-p no:warnings'
+asyncio_mode = "strict"
+
 
 [tool.taskipy.tasks]
 lint = 'ruff check . && ruff check . --diff'
 format = 'ruff check . --fix && ruff format .'
-run = 'fastapi dev smartkitchen_api/main.py'
+run = 'fastapi dev smartkitchien_api/main.py'
 pre_test = 'task lint'
-test = 'pytest -s -x --cov=tests -vv'          # O -x no pytest faz com que o teste pare no primeiro error.
+test = 'pytest -s -x --cov=smartkitchien_api -vv' # O -x no pytest faz com que o teste pare no primeiro error.
 post_test = 'coverage html'
+
 
 [build-system]
 requires = ["poetry-core"]
