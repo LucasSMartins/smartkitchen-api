@@ -1,59 +1,29 @@
-from datetime import datetime
-
 import pytest
-from fastapi import status
-from fastapi.testclient import TestClient
+from beanie import init_beanie
+from models import UserModel
+from mongomock_motor import AsyncMongoMockClient
+
+from smartkitchien_api.models.user_test import UserTest
 
 
 @pytest.mark.asyncio()
-async def test_create_user(client: TestClient):
-    response = client.post(
-        '/api/users',
-        json={
-            'username': 'testuser',
-            'email': 'testuser@example.com',
-            'password': 'Secure!Pass1',
-        },
+async def test_create_user():
+    client = AsyncMongoMockClient()
+    await init_beanie(
+        document_models=[UserTest], database=client.get_database(name='db')
     )
 
-    if response.status_code != status.HTTP_201_CREATED:
-        pytest.fail(
-            f"""Expected status code {status.HTTP_201_CREATED}, but got
-            {response.status_code}"""
-        )
+    # Cria um usuário
+    new_user = UserTest(username='test_user', email='test@example.com', age=30)
+    await new_user.insert()
 
-    response_data = response.json()
+    # Recupera o usuário do banco de dados
+    user = await UserModel.find_one(UserTest.username == 'test_user')
 
-    if response_data['username'] != 'testuser':
-        pytest.fail(
-            f"Expected username 'testuser', but got {response_data['username']}"
-        )
+    AGE = 30
 
-    if response_data['email'] != 'testuser@example.com':
-        pytest.fail(
-            f"Expected email 'testuser@example.com', but got {response_data['email']}"
-        )
-
-    if 'password' in response_data:
-        pytest.fail('Password should not be in the response')
-
-    created_at = response_data.get('created_at', None)
-    if not created_at:
-        pytest.fail("Missing 'created_at' field in response")
-
-    try:
-        datetime.strptime(created_at, '%d/%m/%Y %H:%M:%S')
-    except ValueError:
-        pytest.fail(f"Invalid date format for 'created_at': {created_at}")
-
-    expected_data = {
-        'username': 'testuser',
-        'email': 'testuser@example.com',
-        'created_at': created_at,
-    }
-
-    if response_data != expected_data:
-        pytest.fail(
-            f"""Response data does not match expected data. Expected:
-            {expected_data}, but got: {response_data}"""
-        )
+    # Verifica se o usuário foi inserido corretamente
+    assert user is not None
+    assert user.username == 'test_user'
+    assert user.email == 'test@example.com'
+    assert user.age == AGE

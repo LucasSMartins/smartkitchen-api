@@ -9,4 +9,3 @@ async def my_fixture():
 https://github.com/BeanieODM/beanie/issues/285
 
 https://github.com/michaelkryukov/mongomock_motor
-
