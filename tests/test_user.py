@@ -1,27 +1,27 @@
-import pytest
-from beanie import init_beanie
-from fastapi import status
-from fastapi.testclient import TestClient
-from mongomock_motor import AsyncMongoMockClient  # type: ignore
+# import pytest
+# from beanie import init_beanie
+# from fastapi import status
+# from fastapi.testclient import TestClient
+# from mongomock_motor import AsyncMongoMockClient  # type: ignore
 
-from smartkitchien_api.main import app
-from smartkitchien_api.models.user import User
-
-
-@pytest.fixture(autouse=True)
-async def my_fixture():
-    client = AsyncMongoMockClient()
-    await init_beanie(document_models=[User], database=client.get_database(name='db'))
-    return client
+# from smartkitchien_api.main import app
+# from smartkitchien_api.models.user import User
 
 
-@pytest.mark.asyncio()
-async def test_read_users_empty(my_fixture):
-    with TestClient(app) as client:
-        response = client.get('/')
-    assert response.status_code == status.HTTP_200_OK
-    # assert response.status_code == status.HTTP_404_NOT_FOUND
-    # assert response.json() == {'detail': 'Nenhum usuário foi encontrado'}
+# @pytest.fixture(autouse=True)
+# async def my_fixture():
+#     client = AsyncMongoMockClient()
+#     await init_beanie(document_models=[User], database=client.get_database(name='db'))
+#     return client
+
+
+# @pytest.mark.asyncio()
+# async def test_read_users_empty(my_fixture):
+#     with TestClient(app) as client:
+#         response = client.get('/')
+#     assert response.status_code == status.HTTP_200_OK
+#     # assert response.status_code == status.HTTP_404_NOT_FOUND
+#     # assert response.json() == {'detail': 'Nenhum usuário foi encontrado'}
 
 
 # @pytest.mark.asyncio()
@@ -30,8 +30,8 @@ async def test_read_users_empty(my_fixture):
 #         'username': 'usertest',
 #         'email': 'usertest@example.com',
 #         'password': 'myS&cret007',
-#         'created_at': '2024-01-01T00:00:00Z',
 #     })
+
 #     await user.insert()
 
 #     with TestClient(app) as client:

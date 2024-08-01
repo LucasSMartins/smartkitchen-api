@@ -44,7 +44,7 @@ async def update_user(
     if update_user.password:
         update_user.password = get_password_hash(current_user.password)
 
-    # REMOVE OS CAMPOS COM VALORES ´NONE´
+    # REMOVE OS CAMPOS COM VALORES ´None´
     update_user_data = update_user.model_dump(exclude_none=True)
 
     await current_user.update(Set(update_user_data))
