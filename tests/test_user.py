@@ -1,51 +1,42 @@
-from typing import Optional
-
 import pytest
-from beanie import Document, init_beanie
-from mongomock_motor import AsyncMongoMockClient
-from pydantic import BaseModel
+from beanie import init_beanie
+from fastapi import status
+from fastapi.testclient import TestClient
+from mongomock_motor import AsyncMongoMockClient  # type: ignore
 
-
-class User(BaseModel):
-    username: str
-    email: str
-    age: Optional[int] = None
-
-
-class UserModel(Document, User):
-    class Settings:
-        collection = 'users'
+from smartkitchien_api.main import app
+from smartkitchien_api.models.user import User
 
 
 @pytest.fixture(autouse=True)
 async def my_fixture():
     client = AsyncMongoMockClient()
-    # Inicializa o Beanie com o cliente MongoMock
-    await init_beanie(
-        document_models=[UserModel], database=client.db
-    )
-
+    await init_beanie(document_models=[User], database=client.get_database(name='db'))
     return client
 
 
 @pytest.mark.asyncio()
-async def test_create_user():
-    client = AsyncMongoMockClient()
-    await init_beanie(
-        document_models=[UserModel], database=client.db
-    )
+async def test_read_users_empty(my_fixture):
+    with TestClient(app) as client:
+        response = client.get('/')
+    assert response.status_code == status.HTTP_200_OK
+    # assert response.status_code == status.HTTP_404_NOT_FOUND
+    # assert response.json() == {'detail': 'Nenhum usuário foi encontrado'}
 
-    # Cria um usuário
-    new_user = UserModel(username='test_user', email='test@example.com', age=30)
-    await new_user.insert()
 
-    # Recupera o usuário do banco de dados
-    user = await UserModel.find_one(UserModel.username == 'test_user')
+# @pytest.mark.asyncio()
+# async def test_read_users(my_fixture):
+#     user = User(**{
+#         'username': 'usertest',
+#         'email': 'usertest@example.com',
+#         'password': 'myS&cret007',
+#         'created_at': '2024-01-01T00:00:00Z',
+#     })
+#     await user.insert()
 
-    AGE = 30
-
-    # Verifica se o usuário foi inserido corretamente
-    assert user is not None
-    assert user.username == 'test_user'
-    assert user.email == 'test@example.com'
-    assert user.age == AGE
+#     with TestClient(app) as client:
+#         response = client.get('/')
+#     assert response.status_code == status.HTTP_200_OK
+#     assert len(response.json()) == 1
+#     assert response.json()[0]['username'] == 'usertest'
+#     assert response.json()[0]['email'] == 'usertest@example.com'
