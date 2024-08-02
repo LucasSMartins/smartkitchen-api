@@ -4,6 +4,7 @@ from beanie import PydanticObjectId
 from beanie.operators import Or, Set
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
+from smartkitchien_api.middleware.check_user_permission import check_user_permission
 from smartkitchien_api.models.user import User, UserPublic, UserUpdate, user_example
 from smartkitchien_api.security.security import get_current_user, get_password_hash
 
@@ -16,11 +17,7 @@ async def update_user(
     current_user: Annotated[User, Depends(get_current_user)],
     update_user: UserUpdate = Body(example=user_example),
 ):
-    if current_user.id != user_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Você não tem permissão para isso.',
-        )
+    check_user_permission(current_user.id, user_id)  # type: ignore
 
     username_exist = await User.find(
         Or(
