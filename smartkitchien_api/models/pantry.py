@@ -2,6 +2,7 @@ from enum import Enum
 from typing import List
 
 from beanie import Document, PydanticObjectId
+from bson import ObjectId
 from pydantic import BaseModel, Field
 
 """
@@ -21,25 +22,29 @@ from pydantic import BaseModel, Field
     Pasta and Wheat Products = 113,\n
     Breads and Bakery Products = 114,\n
     Canned goods and preserves = 115,\n
+    Seasonings and Dried Herbs = 116.\n
+    Stationery = 117\n
 #     """
 
 
 class CategoryValue(int, Enum):
-    CANDY = 101
-    FROZEN = 102
-    DRINKS = 103
-    LAUNDRY = 104
-    MEAT_FISH = 105
+    BREADS_BAKERY_PRODUCTS = 101
+    CANDY = 102
+    CANNED_GOODS_PRESERVES = 103
+    CLEANING_MATERIALS = 104
+    CONDIMENTS_SAUCES = 105
     DAIRY_EGGS = 106
-    GROCERY_PRODUCTS = 107
-    PERSONAL_HYGIENE = 108
-    GRAINS_CEREALS = 109
-    CLEANING_MATERIALS = 110
-    FRUITS_VEGETABLES = 111
-    CONDIMENTS_SAUCES = 112
-    PASTA_WHEAT_PRODUCTS = 113
-    BREADS_BAKERY_PRODUCTS = 114
-    CANNED_GOODS_PRESERVES = 115
+    DRINKS = 107
+    FROZEN = 108
+    FRUITS_VEGETABLES = 109
+    GRAINS_CEREALS = 110
+    GROCERY_PRODUCTS = 111
+    LAUNDRY = 112
+    MEAT_FISH = 113
+    PASTA_WHEAT_PRODUCTS = 114
+    PERSONAL_HYGIENE = 115
+    SEASONINGS_AND_DRIED_HERBS = 116
+    STATIONERY = 117
 
 
 class Units(str, Enum):
@@ -50,94 +55,31 @@ class Units(str, Enum):
     KILO_GRAMS = 'kg'
 
 
-class ItemsOut(BaseModel):
-    item_id: PydanticObjectId
-    item_name: str
-    quantity: int
-    unit: Units
-
-
-class ItemsIn(BaseModel):
+class Items(BaseModel):
+    id: str = Field(default=ObjectId())
     item_name: str = Field(
-        ..., min_length=2, max_length=15, pattern=r'^([a-zA-Z0-9À-ÖØ-öø-ÿ ])+$'
+        ..., min_length=2, max_length=20, pattern=r'^([a-zA-Z0-9À-ÖØ-öø-ÿ -])+$'
     )
     quantity: int
     unit: Units
+
+    # @field_validator('id')
+    # def set_id(cls, value):
+    #     return str(ObjectId()) if value is None else value
 
 
 class Categories(BaseModel):
     category_value: CategoryValue
     category_name: str
-    items: List[ItemsOut] = []
+    items: List[Items] = []
 
 
 class Pantry(Document):
     user_id: PydanticObjectId
-    username: str
-    pantry: List[Categories]
+    pantry: dict[str, dict] = {}
 
     class Settings:
         name = 'pantry'
 
 
-pantry_data = [
-    {'category_value': CategoryValue.CANDY, 'category_name': 'Candy', 'items': []},
-    {'category_value': CategoryValue.FROZEN, 'category_name': 'Frozen', 'items': []},
-    {'category_value': CategoryValue.DRINKS, 'category_name': 'Drinks', 'items': []},
-    {'category_value': CategoryValue.LAUNDRY, 'category_name': 'Laundry', 'items': []},
-    {
-        'category_value': CategoryValue.MEAT_FISH,
-        'category_name': 'Meat and Fish',
-        'items': [],
-    },
-    {
-        'category_value': CategoryValue.DAIRY_EGGS,
-        'category_name': 'Dairy and Eggs',
-        'items': [],
-    },
-    {
-        'category_value': CategoryValue.GROCERY_PRODUCTS,
-        'category_name': 'Grocery Products',
-        'items': [],
-    },
-    {
-        'category_value': CategoryValue.PERSONAL_HYGIENE,
-        'category_name': 'Personal hygiene',
-        'items': [],
-    },
-    {
-        'category_value': CategoryValue.GRAINS_CEREALS,
-        'category_name': 'Grains and Cereals',
-        'items': [],
-    },
-    {
-        'category_value': CategoryValue.CLEANING_MATERIALS,
-        'category_name': 'Cleaning materials',
-        'items': [],
-    },
-    {
-        'category_value': CategoryValue.FRUITS_VEGETABLES,
-        'category_name': 'Fruits and vegetables',
-        'items': [],
-    },
-    {
-        'category_value': CategoryValue.CONDIMENTS_SAUCES,
-        'category_name': 'Condiments and Sauces',
-        'items': [],
-    },
-    {
-        'category_value': CategoryValue.PASTA_WHEAT_PRODUCTS,
-        'category_name': 'Pasta and Wheat Products',
-        'items': [],
-    },
-    {
-        'category_value': CategoryValue.BREADS_BAKERY_PRODUCTS,
-        'category_name': 'Breads and Bakery Products',
-        'items': [],
-    },
-    {
-        'category_value': CategoryValue.CANNED_GOODS_PRESERVES,
-        'category_name': 'Canned goods and preserves',
-        'items': [],
-    },
-]
+pantry_example = {'item_name': 'Coca-Cola', 'quantity': 2, 'unit': 'l'}
