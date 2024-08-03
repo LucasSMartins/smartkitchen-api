@@ -4,13 +4,18 @@ from beanie import PydanticObjectId
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from pymongo.errors import PyMongoError
 
+from smartkitchien_api.messages.generic import GenericErrorMessages
+from smartkitchien_api.messages.pantry import (
+    PantryErrorMessages,
+    PantrySuccessMessages,
+)
 from smartkitchien_api.middleware.check_user_permission import check_user_permission
 from smartkitchien_api.models.pantry import (
     Categories,
     CategoryValue,
     Items,
     Pantry,
-    pantry_example,
+    item_example,
 )
 from smartkitchien_api.models.user import User
 from smartkitchien_api.security.security import get_current_user
@@ -18,33 +23,43 @@ from smartkitchien_api.security.security import get_current_user
 router = APIRouter()
 
 
-async def create_category(current_user_pantry, category_value):
-    if str(category_value.value) not in current_user_pantry.pantry:
-        current_user_pantry.pantry[category_value.value] = Categories(
-            category_value=category_value, category_name=category_value.name
+async def create_category(current_user_pantry: Pantry, category_value: CategoryValue):
+    if not any(
+        category.category_value == category_value
+        for category in current_user_pantry.pantry
+    ):
+        current_user_pantry.pantry.append(
+            Categories(category_value=category_value, category_name=category_value.name)
         )
-
         await current_user_pantry.save()
 
 
-async def add_item_to_list(current_user_pantry, category_value, item):
-    item_list = current_user_pantry.pantry[str(category_value.value)]['items']
+async def add_item_to_list(
+    current_user_pantry: Pantry, category_value: CategoryValue, item: Items
+):
+    for category in current_user_pantry.pantry:
+        if category.category_value == category_value:
+            # Verifica se já existe um item com o mesmo nome,
+            # Se algum valor da lista for verdadeiro (true) a função Any retorna True
+            if any(
+                existing_item.item_name == item.item_name
+                for existing_item in category.items
+            ):
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail=PantrySuccessMessages.ITEM_ALREADY_EXISTS,
+                )
 
-    item_exist = any(
-        dict_item_list['item_name'] == item.item_name for dict_item_list in item_list
+            category.items.append(item)
+
+            await current_user_pantry.save()
+
+            return
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=PantryErrorMessages.CATEGORY_NOT_FOUND,
     )
-
-    if item_exist:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f'Já existe um item com o mesmo nome {item.item_name}.',
-        )
-
-    current_user_pantry.pantry[str(category_value.value)]['items'].append(
-        item.model_dump()
-    )
-
-    await current_user_pantry.save()
 
 
 async def get_pantry_collection(current_user_id: PydanticObjectId):
@@ -59,7 +74,7 @@ async def get_pantry_collection(current_user_id: PydanticObjectId):
         # Ou lançar uma exceção personalizada se necessário
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Erro ao acessar o banco de dados.',
+            detail=GenericErrorMessages.INTERNAL_SERVER_ERROR_500,
         )
 
 
@@ -68,7 +83,7 @@ async def create_item_pantry(
     user_id: PydanticObjectId,
     category_value: CategoryValue,
     current_user: Annotated[User, Depends(get_current_user)],
-    item: Items = Body(example=pantry_example),
+    item: Items = Body(example=item_example),
 ):
     """
     **Lista dos valores de cada categoria de alimento**\n
@@ -97,9 +112,14 @@ async def create_item_pantry(
 
     if not pantry_collection:
         # Cria o um Document Pantry na collection pantry.
-        current_user_pantry = await Pantry(user_id=current_user.id).insert()
-
-        await create_category(current_user_pantry, category_value)
+        current_user_pantry = await Pantry(
+            user_id=current_user.id,
+            pantry=[
+                Categories(
+                    category_value=category_value, category_name=category_value.name
+                )
+            ],
+        ).insert()
 
         await add_item_to_list(current_user_pantry, category_value, item)
 
@@ -108,4 +128,4 @@ async def create_item_pantry(
 
         await add_item_to_list(pantry_collection, category_value, item)
 
-    return {'detail': f'Item {item.item_name} adicionado'}
+    return {'detail': PantrySuccessMessages.ITEM_ADDED}

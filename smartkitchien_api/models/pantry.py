@@ -28,23 +28,23 @@ from pydantic import BaseModel, Field
 
 
 class CategoryValue(int, Enum):
-    BREADS_BAKERY_PRODUCTS = 101
-    CANDY = 102
-    CANNED_GOODS_PRESERVES = 103
-    CLEANING_MATERIALS = 104
-    CONDIMENTS_SAUCES = 105
-    DAIRY_EGGS = 106
-    DRINKS = 107
-    FROZEN = 108
-    FRUITS_VEGETABLES = 109
-    GRAINS_CEREALS = 110
-    GROCERY_PRODUCTS = 111
-    LAUNDRY = 112
-    MEAT_FISH = 113
-    PASTA_WHEAT_PRODUCTS = 114
-    PERSONAL_HYGIENE = 115
-    SEASONINGS_AND_DRIED_HERBS = 116
-    STATIONERY = 117
+    BREADS_BAKERY_PRODUCTS = '101'
+    CANDY = '102'
+    CANNED_GOODS_PRESERVES = '103'
+    CLEANING_MATERIALS = '104'
+    CONDIMENTS_SAUCES = '105'
+    DAIRY_EGGS = '106'
+    DRINKS = '107'
+    FROZEN = '108'
+    FRUITS_VEGETABLES = '109'
+    GRAINS_CEREALS = '110'
+    GROCERY_PRODUCTS = '111'
+    LAUNDRY = '112'
+    MEAT_FISH = '113'
+    PASTA_WHEAT_PRODUCTS = '114'
+    PERSONAL_HYGIENE = '115'
+    SEASONINGS_AND_DRIED_HERBS = '116'
+    STATIONERY = '117'
 
 
 class Units(str, Enum):
@@ -56,16 +56,21 @@ class Units(str, Enum):
 
 
 class Items(BaseModel):
-    id: str = Field(default=ObjectId())
+    id: PydanticObjectId = Field(default=ObjectId())
     item_name: str = Field(
         ..., min_length=2, max_length=20, pattern=r'^([a-zA-Z0-9À-ÖØ-öø-ÿ -])+$'
     )
     quantity: int
     unit: Units
 
-    # @field_validator('id')
-    # def set_id(cls, value):
-    #     return str(ObjectId()) if value is None else value
+
+class ItemsUpdate(BaseModel):
+    id: PydanticObjectId | None = None
+    item_name: str | None = Field(
+        None, min_length=2, max_length=20, pattern=r'^([a-zA-Z0-9À-ÖØ-öø-ÿ -])+$'
+    )
+    quantity: int | None = None
+    unit: Units | None = None
 
 
 class Categories(BaseModel):
@@ -76,10 +81,14 @@ class Categories(BaseModel):
 
 class Pantry(Document):
     user_id: PydanticObjectId
-    pantry: dict[str, dict] = {}
+    pantry: list[Categories]
 
     class Settings:
         name = 'pantry'
 
 
-pantry_example = {'item_name': 'Coca-Cola', 'quantity': 2, 'unit': 'l'}
+class PantryPublic(BaseModel):
+    pantry: list[Categories]
+
+
+item_example = {'item_name': 'Coca-Cola', 'quantity': 2, 'unit': 'l'}

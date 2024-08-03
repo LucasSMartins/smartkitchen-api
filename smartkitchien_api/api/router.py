@@ -1,10 +1,9 @@
 from fastapi import APIRouter
 
-# from smartkitchien_api.api.endpoints.pantry.post import router as pantry_delete
-# from smartkitchien_api.api.endpoints.pantry.post import router as pantry_get
+from smartkitchien_api.api.endpoints.pantry.delete import router as pantry_delete
+from smartkitchien_api.api.endpoints.pantry.get import router as pantry_get
 from smartkitchien_api.api.endpoints.pantry.post import router as pantry_post
-
-# from smartkitchien_api.api.endpoints.pantry.post import router as pantry_put
+from smartkitchien_api.api.endpoints.pantry.put import router as pantry_put
 from smartkitchien_api.api.endpoints.token.post import router as token_post
 from smartkitchien_api.api.endpoints.users.delete import router as user_delete
 from smartkitchien_api.api.endpoints.users.get import router as users_get
@@ -19,9 +18,9 @@ api_router.include_router(user_post, prefix='/users', tags=['Users'])
 api_router.include_router(user_put, prefix='/users', tags=['Users'])
 
 api_router.include_router(pantry_post, prefix='/pantry', tags=['Pantry'])
-# api_router.include_router(pantry_delete, prefix='/pantry', tags=['Pantry'])
-# api_router.include_router(pantry_get, prefix='/pantry', tags=['Pantry'])
-# api_router.include_router(pantry_put, prefix='/pantry', tags=['Pantry'])
+api_router.include_router(pantry_get, prefix='/pantry', tags=['Pantry'])
+api_router.include_router(pantry_delete, prefix='/pantry', tags=['Pantry'])
+api_router.include_router(pantry_put, prefix='/pantry', tags=['Pantry'])
 
 
 api_router.include_router(token_post, prefix='/token', tags=['Token'])
