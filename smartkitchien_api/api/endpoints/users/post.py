@@ -1,6 +1,7 @@
 from beanie.operators import Or
 from fastapi import APIRouter, Body, HTTPException, status
 
+from smartkitchien_api.messages.error import ErrorMessages
 from smartkitchien_api.models.user import User, UserPublic, user_example
 from smartkitchien_api.security.security import get_password_hash
 
@@ -22,12 +23,12 @@ async def create_new_user(
         if username_exist.username == user.username:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail='O nome de usuário já existe',
+                detail=ErrorMessages.USERNAME_ALREADY_EXISTS,
             )
         elif username_exist.email == user.email:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail='O e-mail já existe',
+                detail=ErrorMessages.EMAIL_ALREADY_EXISTS,
             )
 
     user.password = get_password_hash(user.password)

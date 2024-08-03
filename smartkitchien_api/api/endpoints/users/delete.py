@@ -3,6 +3,7 @@ from typing import Annotated
 from beanie import PydanticObjectId
 from fastapi import APIRouter, Depends, status
 
+from smartkitchien_api.messages.success import SuccessMessages
 from smartkitchien_api.middleware.check_user_permission import check_user_permission
 from smartkitchien_api.models.user import User
 from smartkitchien_api.security.security import get_current_user
@@ -19,4 +20,4 @@ async def delete_user(
 
     await current_user.delete()
 
-    return {'detail': 'Usuário deletado com sucesso.'}
+    return {'detail': SuccessMessages.USER_DELETED}

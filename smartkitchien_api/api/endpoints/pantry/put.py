@@ -1,11 +1,9 @@
 from typing import Annotated
 
 from beanie import PydanticObjectId
-from beanie.operators import Set
-from bson import ObjectId
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
-from smartkitchien_api.messages.pantry import PantryErrorMessages
+from smartkitchien_api.messages.error import ErrorMessages
 from smartkitchien_api.middleware.check_user_permission import check_user_permission
 from smartkitchien_api.models.pantry import (
     CategoryValue,
@@ -21,7 +19,7 @@ router = APIRouter()
 
 
 @router.put('/', status_code=status.HTTP_200_OK)
-async def update_user(
+async def update_item_pantry(
     user_id: PydanticObjectId,
     item_id: PydanticObjectId,
     category_value: CategoryValue,
@@ -35,7 +33,7 @@ async def update_user(
     if not user_pantry:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=PantryErrorMessages.PANTRY_NOT_FOUND,
+            detail=ErrorMessages.PANTRY_NOT_FOUND,
         )
 
     # Procura o item e atualiza-o na categoria correspondente
@@ -59,13 +57,13 @@ async def update_user(
     if not category_found:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=PantryErrorMessages.CATEGORY_NOT_FOUND,
+            detail=ErrorMessages.CATEGORY_NOT_FOUND,
         )
 
     if not item_found:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=PantryErrorMessages.ITEM_NOT_FOUND,
+            detail=ErrorMessages.ITEM_NOT_FOUND,
         )
 
     await user_pantry.save()

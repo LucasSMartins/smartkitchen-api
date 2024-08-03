@@ -3,6 +3,7 @@ from typing import Annotated, List
 from beanie import PydanticObjectId
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from smartkitchien_api.messages.error import ErrorMessages
 from smartkitchien_api.middleware.check_user_permission import check_user_permission
 from smartkitchien_api.models.user import User, UserPublic
 from smartkitchien_api.security.security import get_current_user
@@ -17,7 +18,7 @@ async def read_users():
     if not users:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='Nenhum usuário foi encontrado',
+            detail=ErrorMessages.USER_NOT_FOUND,
         )
 
     return users

@@ -4,11 +4,9 @@ from beanie import PydanticObjectId
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from pymongo.errors import PyMongoError
 
+from smartkitchien_api.messages.error import ErrorMessages
 from smartkitchien_api.messages.generic import GenericErrorMessages
-from smartkitchien_api.messages.pantry import (
-    PantryErrorMessages,
-    PantrySuccessMessages,
-)
+from smartkitchien_api.messages.success import SuccessMessages
 from smartkitchien_api.middleware.check_user_permission import check_user_permission
 from smartkitchien_api.models.pantry import (
     Categories,
@@ -47,7 +45,7 @@ async def add_item_to_list(
             ):
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
-                    detail=PantrySuccessMessages.ITEM_ALREADY_EXISTS,
+                    detail=ErrorMessages.ITEM_ALREADY_EXISTS,
                 )
 
             category.items.append(item)
@@ -58,7 +56,7 @@ async def add_item_to_list(
 
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=PantryErrorMessages.CATEGORY_NOT_FOUND,
+        detail=ErrorMessages.CATEGORY_NOT_FOUND,
     )
 
 
@@ -128,4 +126,4 @@ async def create_item_pantry(
 
         await add_item_to_list(pantry_collection, category_value, item)
 
-    return {'detail': PantrySuccessMessages.ITEM_ADDED}
+    return {'detail': SuccessMessages.ITEM_ADDED}

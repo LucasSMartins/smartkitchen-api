@@ -4,6 +4,7 @@ from beanie import PydanticObjectId
 from beanie.operators import Or, Set
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
+from smartkitchien_api.messages.error import ErrorMessages
 from smartkitchien_api.middleware.check_user_permission import check_user_permission
 from smartkitchien_api.models.user import User, UserPublic, UserUpdate, user_example
 from smartkitchien_api.security.security import get_current_user, get_password_hash
@@ -30,12 +31,12 @@ async def update_user(
         if username_exist.username == update_user.username:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail='O nome de usuário já existe',
+                detail=ErrorMessages.USERNAME_ALREADY_EXISTS,
             )
         elif username_exist.email == update_user.email:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail='O e-mail já existe',
+                detail=ErrorMessages.EMAIL_ALREADY_EXISTS,
             )
 
     if update_user.password:

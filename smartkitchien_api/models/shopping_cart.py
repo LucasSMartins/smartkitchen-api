@@ -1,30 +1,9 @@
 from enum import Enum
 from typing import List
 
-from beanie import Document, PydanticObjectId
+from beanie import DecimalAnnotation, Document, PydanticObjectId
 from bson import ObjectId
 from pydantic import BaseModel, Field
-
-"""
-    **List of food category values**\n
-    Candy = 101,\n
-    Frozen = 102,\n
-    Drinks = 103,\n
-    Laundry = 104,\n
-    Meat and Fish = 105,\n
-    Dairy and Eggs = 106,\n
-    Grocery Products = 107,\n
-    Personal hygiene = 108,\n
-    Grains and Cereals = 109,\n
-    Cleaning materials = 110,\n
-    Fruits and vegetables = 111,\n
-    Condiments and Sauces = 112,\n
-    Pasta and Wheat Products = 113,\n
-    Breads and Bakery Products = 114,\n
-    Canned goods and preserves = 115,\n
-    Seasonings and Dried Herbs = 116.\n
-    Stationery = 117\n
-#     """
 
 
 class CategoryValue(Enum):
@@ -62,6 +41,7 @@ class Items(BaseModel):
     )
     quantity: int
     unit: Units
+    price: DecimalAnnotation | None = None
 
 
 class ItemsUpdate(BaseModel):
@@ -71,6 +51,7 @@ class ItemsUpdate(BaseModel):
     )
     quantity: int | None = None
     unit: Units | None = None
+    price: DecimalAnnotation | None = None
 
 
 class Categories(BaseModel):
@@ -79,16 +60,16 @@ class Categories(BaseModel):
     items: List[Items] = []
 
 
-class Pantry(Document):
+class ShoppingCart(Document):
     user_id: PydanticObjectId
-    pantry: list[Categories]
+    shopping_cart: list[Categories]
 
     class Settings:
-        name = 'pantry'
+        name = 'shopping_cart'
 
 
-class PantryPublic(BaseModel):
-    pantry: list[Categories]
+class ShoppingCartPublic(BaseModel):
+    shopping_cart: list[Categories]
 
 
-item_example = {'item_name': 'Coca-Cola', 'quantity': 2, 'unit': 'l'}
+item_example = {'item_name': 'Coca-Cola', 'quantity': 2, 'unit': 'l', 'price': 3.23}

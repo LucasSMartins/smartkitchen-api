@@ -3,7 +3,7 @@ from typing import Annotated
 from beanie import PydanticObjectId
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from smartkitchien_api.messages.pantry import PantryErrorMessages
+from smartkitchien_api.messages.error import ErrorMessages
 from smartkitchien_api.middleware.check_user_permission import check_user_permission
 from smartkitchien_api.models.pantry import Pantry, PantryPublic
 from smartkitchien_api.models.user import User
@@ -24,7 +24,7 @@ async def read_user_pantry(
     if not user_pantry:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=PantryErrorMessages.PANTRY_NOT_FOUND,
+            detail=ErrorMessages.PANTRY_NOT_FOUND,
         )
 
     user_pantry_data = PantryPublic(**user_pantry.model_dump())  # type: ignore
