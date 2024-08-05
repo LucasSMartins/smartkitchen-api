@@ -6,25 +6,30 @@ from fastapi import APIRouter, Body, Depends, HTTPException, status
 from smartkitchien_api.messages.error import ErrorMessages
 from smartkitchien_api.middleware.check_user_permission import check_user_permission
 from smartkitchien_api.models.shopping_cart import (
-    CategoryValue,
-    ItemsUpdate,
     ShoppingCart,
     ShoppingCartPublic,
-    item_example,
+    item_with_price,
 )
 from smartkitchien_api.models.user import User
+from smartkitchien_api.schema.categories import CategoryValue
+from smartkitchien_api.schema.enums.category_value import category_description
+from smartkitchien_api.schema.items import ItemsUpdate
 from smartkitchien_api.security.security import get_current_user
 
 router = APIRouter()
 
 
-@router.put('/', status_code=status.HTTP_200_OK)
+@router.put(
+    '/{user_id}', status_code=status.HTTP_200_OK, description=category_description
+)
 async def update_item_shopping_cart(
     user_id: PydanticObjectId,
     item_id: PydanticObjectId,
     category_value: CategoryValue,
     current_user: Annotated[User, Depends(get_current_user)],
-    item_update: ItemsUpdate = Body(example=item_example),
+    item_update: ItemsUpdate = Body(
+        example=item_with_price,
+    ),
 ):
     check_user_permission(current_user.id, user_id)  # type: ignore
 

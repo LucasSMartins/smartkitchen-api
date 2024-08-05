@@ -7,8 +7,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from smartkitchien_api.messages.error import ErrorMessages
 from smartkitchien_api.messages.success import SuccessMessages
 from smartkitchien_api.middleware.check_user_permission import check_user_permission
-from smartkitchien_api.models.shopping_cart import CategoryValue, ShoppingCart
+from smartkitchien_api.models.shopping_cart import ShoppingCart
 from smartkitchien_api.models.user import User
+from smartkitchien_api.schema.categories import CategoryValue
 from smartkitchien_api.security.security import get_current_user
 
 router = APIRouter()

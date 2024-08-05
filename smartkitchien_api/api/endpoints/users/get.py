@@ -11,7 +11,7 @@ from smartkitchien_api.security.security import get_current_user
 router = APIRouter()
 
 
-@router.get('/', status_code=status.HTTP_200_OK, response_model=List[UserPublic])
+@router.get('/', status_code=status.HTTP_200_OK, response_model=List[User])
 async def read_users():
     users = await User.find().to_list()
 

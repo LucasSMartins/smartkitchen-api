@@ -16,12 +16,13 @@ class User(Document):
     def validade_username(cls, username_value: str):
         if not re_match(r'^[a-zA-Z0-9._]+$', username_value):
             raise ValueError(
-                'O nome de usuário deve conter apenas letras,números,  underline ou ponto.'  # noqa: E501
+                'O nome de usuário não deve conter repetição excessiva de caracteres'
             )
 
         if re_search(r'(.)\1{3,}', username_value):
             raise ValueError(
-                'O nome de usuário não deve conter repetição excessiva de caracteres'
+                """O nome de usuário não deve
+                conter repetição excessiva de caracteres em sequência"""
             )
 
         return username_value

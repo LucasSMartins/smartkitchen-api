@@ -14,7 +14,7 @@ beanie = "^1.26.0"
 pydantic-settings = "^2.3.4"
 pwdlib = { extras = ["argon2"], version = "^0.2.0" }
 pyjwt = "^2.8.0"
-passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+passlib = { extras = ["bcrypt"], version = "^1.7.4" }
 setuptools = "^72.1.0"
 
 [tool.poetry.group.dev.dependencies]
@@ -46,13 +46,12 @@ addopts = '-p no:warnings'
 asyncio_mode = "strict"
 
 
-
 [tool.taskipy.tasks]
 lint = 'ruff check . && ruff check . --diff'
 format = 'ruff check . --fix && ruff format .'
 run = 'fastapi dev smartkitchien_api/main.py'
 pre_test = 'task lint'
-test = 'pytest -s -x --cov=smartkitchien_api -vv' # O -x no pytest faz com que o teste pare no primeiro error.
+test = 'pytest -s --cov=smartkitchien_api -vv' # O -x no pytest faz com que o teste pare no primeiro error.
 post_test = 'coverage html'
 
 
