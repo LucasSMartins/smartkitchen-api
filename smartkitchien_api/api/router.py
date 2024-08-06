@@ -1,36 +1,36 @@
 from fastapi import APIRouter
 
 # * Importações do RECIPE
-from smartkitchien_api.api.endpoints.cookbook.post import router as cookbook_post
+from smartkitchien_api.api.routes.cookbook.post import router as cookbook_post
 
 # * Importações do PANTRY
-from smartkitchien_api.api.endpoints.pantry.delete import router as pantry_delete
-from smartkitchien_api.api.endpoints.pantry.get import router as pantry_get
-from smartkitchien_api.api.endpoints.pantry.post import router as pantry_post
-from smartkitchien_api.api.endpoints.pantry.put import router as pantry_put
+from smartkitchien_api.api.routes.pantry.delete import router as pantry_delete
+from smartkitchien_api.api.routes.pantry.get import router as pantry_get
+from smartkitchien_api.api.routes.pantry.post import router as pantry_post
+from smartkitchien_api.api.routes.pantry.put import router as pantry_put
 
 # * Importações do SHOPPING_CART
-from smartkitchien_api.api.endpoints.shopping_cart.delete import (
+from smartkitchien_api.api.routes.shopping_cart.delete import (
     router as shopping_cart_delete,
 )
-from smartkitchien_api.api.endpoints.shopping_cart.get import (
+from smartkitchien_api.api.routes.shopping_cart.get import (
     router as shopping_cart_get,
 )
-from smartkitchien_api.api.endpoints.shopping_cart.post import (
+from smartkitchien_api.api.routes.shopping_cart.post import (
     router as shopping_cart_post,
 )
-from smartkitchien_api.api.endpoints.shopping_cart.put import (
+from smartkitchien_api.api.routes.shopping_cart.put import (
     router as shopping_cart_put,
 )
 
 # * Importações do TOKEN
-from smartkitchien_api.api.endpoints.token.post import router as token_post
+from smartkitchien_api.api.routes.token.post import router as token_post
 
 # * Importações do USER
-from smartkitchien_api.api.endpoints.users.delete import router as user_delete
-from smartkitchien_api.api.endpoints.users.get import router as users_get
-from smartkitchien_api.api.endpoints.users.post import router as user_post
-from smartkitchien_api.api.endpoints.users.put import router as user_put
+from smartkitchien_api.api.routes.users.delete import router as user_delete
+from smartkitchien_api.api.routes.users.get import router as users_get
+from smartkitchien_api.api.routes.users.post import router as user_post
+from smartkitchien_api.api.routes.users.put import router as user_put
 
 api_router = APIRouter()
 

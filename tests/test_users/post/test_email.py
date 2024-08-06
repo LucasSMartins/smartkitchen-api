@@ -47,7 +47,7 @@ async def test_required_field_email():
 
 
 @pytest.mark.asyncio()
-async def test_email_validation():
+async def test_email_validation_without_at_sign():
     new_user = {
         'username': 'usertest',
         'email': 'usertestexample.com',
