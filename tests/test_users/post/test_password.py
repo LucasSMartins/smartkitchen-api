@@ -1,15 +1,9 @@
 import pytest
 from fastapi import status
-from fastapi.testclient import TestClient
-
-from smartkitchien_api.main import app
-
-# Crie um cliente de teste para a aplicação FastAPI
-client = TestClient(app)
 
 
 @pytest.mark.asyncio()
-async def test_required_field_password():
+async def test_required_field_password(client):
     new_user = {
         'username': 'usertest',
         'email': 'usertest@example.com',
@@ -17,7 +11,7 @@ async def test_required_field_password():
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'missing'
@@ -25,7 +19,7 @@ async def test_required_field_password():
 
 
 @pytest.mark.asyncio()
-async def test_password_validation_lt_8():
+async def test_password_validation_lt_8(client):
     new_user = {
         'username': 'usertest',
         'email': 'usertest@example.com',
@@ -34,7 +28,7 @@ async def test_password_validation_lt_8():
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'string_too_short'
@@ -42,7 +36,7 @@ async def test_password_validation_lt_8():
 
 
 @pytest.mark.asyncio()
-async def test_password_validation_must_contain_character_uppercase():
+async def test_password_validation_must_contain_character_uppercase(client):
     new_user = {
         'username': 'usertest',
         'email': 'usertest@example.com',
@@ -51,7 +45,7 @@ async def test_password_validation_must_contain_character_uppercase():
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'value_error'
@@ -59,7 +53,7 @@ async def test_password_validation_must_contain_character_uppercase():
 
 
 @pytest.mark.asyncio()
-async def test_password_validation_must_contain_special_character():
+async def test_password_validation_must_contain_special_character(client):
     new_user = {
         'username': 'usertest',
         'email': 'usertest@example.com',
@@ -68,7 +62,7 @@ async def test_password_validation_must_contain_special_character():
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'value_error'
@@ -76,7 +70,7 @@ async def test_password_validation_must_contain_special_character():
 
 
 @pytest.mark.asyncio()
-async def test_password_validation_must_contain_number():
+async def test_password_validation_must_contain_number(client):
     new_user = {
         'username': 'usertest',
         'email': 'usertest@example.com',
@@ -85,7 +79,7 @@ async def test_password_validation_must_contain_number():
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'value_error'

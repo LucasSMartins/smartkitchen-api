@@ -3,7 +3,7 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jwt import decode, encode
+from jwt import decode, encode, get_unverified_header
 from jwt.exceptions import InvalidTokenError
 from pwdlib import PasswordHash
 
@@ -64,3 +64,14 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         raise credentials_exception
 
     return user
+
+
+# Função para validar o token JWT
+def validate_jwt(token: str):
+    try:
+        get_unverified_header(token)
+        decode(token, setting.SECRET_KEY, algorithms=[setting.ALGORITHM])
+
+        return True
+    except InvalidTokenError:
+        return False

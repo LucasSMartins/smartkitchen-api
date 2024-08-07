@@ -27,6 +27,7 @@ commitizen = "^3.27.0"
 asgi-lifespan = "^2.1.0"
 mongomock = "^4.1.2"
 mongomock-motor = "^0.0.31"
+faker = "^26.2.0"
 
 [tool.ruff]
 # line-length = 79
@@ -51,7 +52,7 @@ lint = 'ruff check . && ruff check . --diff'
 format = 'ruff check . --fix && ruff format .'
 run = 'fastapi dev smartkitchien_api/main.py'
 pre_test = 'task lint'
-test = 'pytest -s --cov=smartkitchien_api -vv' # O -x no pytest faz com que o teste pare no primeiro error.
+test = 'pytest -s -x --cov=smartkitchien_api -vv' # O -x no pytest faz com que o teste pare no primeiro error.
 post_test = 'coverage html'
 
 

@@ -1,17 +1,12 @@
 import pytest
 from fastapi import status
-from fastapi.testclient import TestClient
 
-from smartkitchien_api.main import app
 from smartkitchien_api.messages.error import ErrorMessages
 from smartkitchien_api.models.user import User
 
-# Crie um cliente de teste para a aplicação FastAPI
-client = TestClient(app)
-
 
 @pytest.mark.asyncio()
-async def test_email_exist():
+async def test_email_exist(client):
     new_user = {
         'username': 'usertest_email',
         'email': 'usertest@example.com',
@@ -32,14 +27,14 @@ async def test_email_exist():
 
 
 @pytest.mark.asyncio()
-async def test_required_field_email():
+async def test_required_field_email(client):
     new_user = {
         'username': 'usertest',
         'password': 'myS&cret007',
     }
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'missing'
@@ -47,7 +42,7 @@ async def test_required_field_email():
 
 
 @pytest.mark.asyncio()
-async def test_email_validation_without_at_sign():
+async def test_email_validation_without_at_sign(client):
     new_user = {
         'username': 'usertest',
         'email': 'usertestexample.com',
@@ -56,7 +51,7 @@ async def test_email_validation_without_at_sign():
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'value_error'
@@ -64,7 +59,7 @@ async def test_email_validation_without_at_sign():
 
 
 @pytest.mark.asyncio()
-async def test_email_validation_with_space():
+async def test_email_validation_with_space(client):
     new_user = {
         'username': 'usertest',
         'email': 'usertest @example.com',
@@ -73,7 +68,7 @@ async def test_email_validation_with_space():
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'value_error'
@@ -81,16 +76,16 @@ async def test_email_validation_with_space():
 
 
 @pytest.mark.asyncio()
-async def test_email_validation_with_invalid_character():
+async def test_email_validation_with_invalid_character(client):
     new_user = {
         'username': 'usertest',
         'email': 'usertest@example!.com',
         'password': 'myS&cret007',
     }
 
-    response = client.post('/api/users', json=new_user)
+    response = client.post('/api/users', json=new_user)  # type: ignore
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'value_error'
@@ -98,7 +93,7 @@ async def test_email_validation_with_invalid_character():
 
 
 @pytest.mark.asyncio()
-async def test_email_validation_without_domain():
+async def test_email_validation_without_domain(client):
     new_user = {
         'username': 'usertest',
         'email': 'usertest@',
@@ -107,7 +102,7 @@ async def test_email_validation_without_domain():
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'value_error'
@@ -115,7 +110,7 @@ async def test_email_validation_without_domain():
 
 
 @pytest.mark.asyncio()
-async def test_email_validation_with_invalid_domain():
+async def test_email_validation_with_invalid_domain(client):
     new_user = {
         'username': 'usertest',
         'email': 'usertest@example.invalid',
@@ -124,7 +119,7 @@ async def test_email_validation_with_invalid_domain():
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'value_error'
@@ -132,7 +127,7 @@ async def test_email_validation_with_invalid_domain():
 
 
 @pytest.mark.asyncio()
-async def test_email_validation_with_multiple_at():
+async def test_email_validation_with_multiple_at(client):
     new_user = {
         'username': 'usertest',
         'email': 'usertest@example.com@example.com',
@@ -141,7 +136,7 @@ async def test_email_validation_with_multiple_at():
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'value_error'
@@ -149,7 +144,7 @@ async def test_email_validation_with_multiple_at():
 
 
 @pytest.mark.asyncio()
-async def test_email_validation_with_non_allowed_character():
+async def test_email_validation_with_non_allowed_character(client):
     new_user = {
         'username': 'usertest',
         'email': 'usertest@example.com£',
@@ -158,7 +153,7 @@ async def test_email_validation_with_non_allowed_character():
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'value_error'

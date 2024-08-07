@@ -1,18 +1,13 @@
 import pytest
 from fastapi import status
-from fastapi.testclient import TestClient
 
-from smartkitchien_api.main import app
 from smartkitchien_api.messages.error import ErrorMessages
 from smartkitchien_api.models.user import User
 from smartkitchien_api.security.security import get_password_hash
 
-# Crie um cliente de teste para a aplicação FastAPI
-client = TestClient(app)
-
 
 @pytest.mark.asyncio()
-async def test_read_all_users_and_returns_list_users():
+async def test_read_all_users_and_returns_list_users(client):
     pwd_hash = get_password_hash('myS&cret007')
     users = [
         User(username='usertest1', email='usertest1@example.com', password=pwd_hash),
@@ -28,7 +23,7 @@ async def test_read_all_users_and_returns_list_users():
 
     response = client.get('/api/users')
 
-    user_response = User(**response.json()[0])
+    user_response = User(**response.json()[0])  # type: ignore
 
     assert response.status_code == status.HTTP_200_OK
     assert isinstance(response.json(), list)
@@ -36,17 +31,29 @@ async def test_read_all_users_and_returns_list_users():
 
 
 @pytest.mark.asyncio()
-async def test_read_all_users_and_empty_returns_not_found():
+async def test_read_all_users_and_empty_returns_not_found(client):
     response = client.get('/api/users')
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
-    assert response.json()['detail'] == ErrorMessages.USER_NOT_FOUND
+    assert response.json()['detail'] == ErrorMessages.USER_NOT_FOUND  # type: ignore
 
 
 @pytest.mark.asyncio()
-async def test_read_user_me(test_current_user, token):
-    response = client.get('/api/users/me', headers=token)
+async def test_read_user_me(client, token, faker_user):
+    response = client.get('/api/users/me', headers={'Authorization': f'Bearer {token}'})
+
     assert response.status_code == status.HTTP_200_OK
 
-    assert response.json()['username'] == test_current_user.username
-    assert response.json()['email'] == test_current_user.email
+    assert response.json()['username'] == faker_user.username  # type: ignore
+    assert response.json()['email'] == faker_user.email  # type: ignore
+
+
+@pytest.mark.asyncio()
+async def test_read_user_and_return_user_by_id(client, token, faker_user):
+    response = client.get(
+        f'/api/users/{faker_user.id}', headers={'Authorization': f'Bearer {token}'}
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()['username'] == faker_user.username  # type: ignore
+    assert response.json()['email'] == faker_user.email  # type: ignore

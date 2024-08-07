@@ -11,7 +11,7 @@ from smartkitchien_api.security.security import get_current_user
 router = APIRouter()
 
 
-@router.delete('/', status_code=status.HTTP_200_OK)
+@router.delete('/{user_id}', status_code=status.HTTP_200_OK)
 async def delete_user(
     user_id: PydanticObjectId,
     current_user: Annotated[User, Depends(get_current_user)],

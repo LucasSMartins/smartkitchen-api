@@ -18,7 +18,7 @@ async def login_for_acess_token(
     if not user or not verify_password(form_data.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='O e-mail ou senha estão incorretos.',
+            detail='O email ou senha estão incorretos',
             headers={'WWW-Authenticate': 'Bearer'},
         )
 

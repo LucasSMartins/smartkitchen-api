@@ -7,3 +7,8 @@ class ErrorMessages:
     SHOPPING_CART_NOT_FOUND: str = 'Carrinho de compras não encontrado'
     USER_NOT_FOUND: str = 'Usuário não encontrado'
     USERNAME_ALREADY_EXISTS: str = 'Nome de usuário já existe'
+    BAD_REQUEST_CHECK_PERMISSION_USER: str = 'Você não tem permissão para isso.'
+    VALUE_ERROR: str = 'value_error'
+    PYDANTIC_OBJECT_ID: str = 'Value error, Id must be of type PydanticObjectId'
+    UNAUTHORIZED: str = 'Not authenticated'
+    TOKEN_INVALID: str = 'Could not validate credentials'

@@ -3,21 +3,16 @@ from datetime import datetime, timedelta
 import pytest
 from bson import ObjectId
 from fastapi import status
-from fastapi.testclient import TestClient
 
-from smartkitchien_api.main import app
 from smartkitchien_api.messages.error import ErrorMessages
 from smartkitchien_api.messages.success import SuccessMessages
 from smartkitchien_api.models.user import User
 from smartkitchien_api.security.security import verify_password
 
-# Crie um cliente de teste para a aplicação FastAPI
-client = TestClient(app)
-
 
 # Crie um teste para a rota de criação de usuário
 @pytest.mark.asyncio()
-async def test_create_user():
+async def test_create_user(client):
     # Crie um novo usuário
     new_user = {
         'username': 'usertest',
@@ -30,7 +25,7 @@ async def test_create_user():
 
     # Verifique se a requisição foi bem-sucedida
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.json() == {'detail': SuccessMessages.USER_CREATED}
+    assert response.json() == {'detail': SuccessMessages.USER_CREATED}  # type: ignore
 
     # Verifique se o usuário foi criado com sucesso
     user = await User.find_one(User.email == new_user['email'])
@@ -49,7 +44,7 @@ async def test_create_user():
 
 
 @pytest.mark.asyncio()
-async def test_username_exist():
+async def test_username_exist(client):
     new_user = {
         'username': 'usertest',
         'email': 'user_test@example.com',
@@ -66,18 +61,18 @@ async def test_username_exist():
 
     # Verifique se a requisição foi bem-sucedida
     assert response.status_code == status.HTTP_409_CONFLICT
-    assert response.json() == {'detail': ErrorMessages.USERNAME_ALREADY_EXISTS}
+    assert response.json() == {'detail': ErrorMessages.USERNAME_ALREADY_EXISTS}  # type: ignore
 
 
 @pytest.mark.asyncio()
-async def test_required_field_username():
+async def test_required_field_username(client):
     new_user = {
         'email': 'usertest@example.com',
         'password': 'myS&cret007',
     }
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'missing'
@@ -85,7 +80,7 @@ async def test_required_field_username():
 
 
 @pytest.mark.asyncio()
-async def test_username_validation_lt_3_characters():
+async def test_username_validation_lt_3_characters(client):
     new_user = {
         'username': 'us',
         'email': 'usertest@example.com',
@@ -94,7 +89,7 @@ async def test_username_validation_lt_3_characters():
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'string_too_short'
@@ -102,7 +97,7 @@ async def test_username_validation_lt_3_characters():
 
 
 @pytest.mark.asyncio()
-async def test_username_validation_gt_16_characters():
+async def test_username_validation_gt_16_characters(client):
     new_user = {
         'username': 'usertest_usertest_usertest_usertest',
         'email': 'usertest@example.com',
@@ -111,7 +106,7 @@ async def test_username_validation_gt_16_characters():
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'string_too_long'
@@ -119,7 +114,7 @@ async def test_username_validation_gt_16_characters():
 
 
 @pytest.mark.asyncio()
-async def test_username_validation_must_not_contain_special_characters():
+async def test_username_validation_must_not_contain_special_characters(client):
     new_user = {
         'username': 'usertest#',
         'email': 'usertest@example.com',
@@ -128,7 +123,7 @@ async def test_username_validation_must_not_contain_special_characters():
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'value_error'
@@ -136,7 +131,9 @@ async def test_username_validation_must_not_contain_special_characters():
 
 
 @pytest.mark.asyncio()
-async def test_username_validation_must_not_contain_more_3_repeated_characters_sequence():  # noqa: E501
+async def test_username_validation_must_not_contain_more_3_repeated_characters_sequence(
+    client,
+):  # noqa: E501
     new_user = {
         'username': 'uuuuusertest',
         'email': 'usertest@example.com',
@@ -145,7 +142,7 @@ async def test_username_validation_must_not_contain_more_3_repeated_characters_s
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]
+    msg = response.json()['detail'][0]  # type: ignore
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert msg['type'] == 'value_error'
