@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from beanie import PydanticObjectId
-from beanie.operators import Or, Set
+from beanie.operators import Set
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
 from smartkitchien_api.messages.error import ErrorMessages
@@ -12,7 +12,9 @@ from smartkitchien_api.security.security import get_current_user, get_password_h
 router = APIRouter()
 
 
-@router.put('/', status_code=status.HTTP_200_OK, response_model=UserPublic)
+@router.put(
+    '/{user_id}', status_code=status.HTTP_200_OK, response_model=dict[str, UserPublic]
+)
 async def update_user(
     user_id: PydanticObjectId,
     current_user: Annotated[User, Depends(get_current_user)],
@@ -20,12 +22,7 @@ async def update_user(
 ):
     check_user_permission(current_user.id, user_id)  # type: ignore
 
-    username_exist = await User.find(
-        Or(
-            User.username == update_user.username,
-            User.email == update_user.email,
-        )
-    ).first_or_none()
+    username_exist = await User.get(current_user.id)
 
     if username_exist:
         if username_exist.username == update_user.username:
@@ -47,4 +44,6 @@ async def update_user(
 
     await current_user.update(Set(update_user_data))
 
-    return UserPublic(**current_user.model_dump())
+    update_user_public = UserPublic(**current_user.model_dump())
+
+    return {'detail': update_user_public}
