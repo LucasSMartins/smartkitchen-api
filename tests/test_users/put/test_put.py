@@ -2,7 +2,7 @@ import pytest
 from fastapi import status
 
 from smartkitchien_api.models.user import User
-from smartkitchien_api.security.security import get_password_hash, verify_password
+from smartkitchien_api.security.security import verify_password
 
 
 @pytest.mark.asyncio()

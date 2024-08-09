@@ -22,7 +22,7 @@ async def update_user(
 ):
     check_user_permission(current_user.id, user_id)  # type: ignore
 
-    username_exist = await User.get(current_user.id)
+    username_exist = await User.get(user_id)
 
     if username_exist:
         if username_exist.username == update_user.username:
@@ -37,7 +37,7 @@ async def update_user(
             )
 
     if update_user.password:
-        update_user.password = get_password_hash(current_user.password)
+        update_user.password = get_password_hash(update_user.password)
 
     # REMOVE OS CAMPOS COM VALORES ´None´
     update_user_data = update_user.model_dump(exclude_none=True)

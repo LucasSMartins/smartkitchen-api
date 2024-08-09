@@ -15,12 +15,12 @@ async def login_for_acess_token(
     # Aqui eu defino se o Login será por e-mail ou por username
     user = await User.find(User.username == form_data.username).first_or_none()
 
-    # if not user or not verify_password(form_data.password, user.password):
-    #     raise HTTPException(
-    #         status_code=status.HTTP_401_UNAUTHORIZED,
-    #         detail='O email ou senha estão incorretos',
-    #         headers={'WWW-Authenticate': 'Bearer'},
-    #     )
+    if not user or not verify_password(form_data.password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='O nome de usuário ou senha estão incorretos',
+            headers={'WWW-Authenticate': 'Bearer'},
+        )
 
     access_token = create_access_token(payload_data={'sub': user.username})
 
