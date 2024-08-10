@@ -64,4 +64,4 @@ async def test_delete_user_with_invalid_token(client, faker_user):
     )
 
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    assert response.json() == {'detail': ErrorMessages.TOKEN_INVALID}
+    assert response.json() == {'detail': ErrorMessages.NOT_VALIDATE_CREDENTIALS_401}

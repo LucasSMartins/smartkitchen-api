@@ -8,6 +8,7 @@ from jwt.exceptions import InvalidTokenError
 from pwdlib import PasswordHash
 
 from smartkitchien_api.config.settings import setting
+from smartkitchien_api.messages.error import ErrorMessages
 from smartkitchien_api.models.user import User
 
 # https://polar.sh/frankie567/posts/introducing-pwdlib-a-modern-password-hash-helper-for-python
@@ -42,31 +43,36 @@ def create_access_token(payload_data: dict, expires_delta: timedelta | None = No
 
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail='Could not validate credentials',
-        headers={'WWW-Authenticate': 'Bearer'},
-    )
-
     try:
         payload = decode(token, setting.SECRET_KEY, algorithms=[setting.ALGORITHM])
 
         username: str = payload.get('sub')
 
         if not username:
-            raise credentials_exception
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=ErrorMessages.NOT_VALIDATE_CREDENTIALS_401,
+                headers={'WWW-Authenticate': 'Bearer'},
+            )
     except InvalidTokenError:
-        raise credentials_exception
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=ErrorMessages.NOT_VALIDATE_CREDENTIALS_401,
+            headers={'WWW-Authenticate': 'Bearer'},
+        )
 
     user = await User.find(User.username == username).first_or_none()
 
     if not user:
-        raise credentials_exception
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=ErrorMessages.NOT_VALIDATE_CREDENTIALS_401,
+            headers={'WWW-Authenticate': 'Bearer'},
+        )
 
     return user
 
 
-# Função para validar o token JWT
 def validate_jwt(token: str):
     try:
         get_unverified_header(token)

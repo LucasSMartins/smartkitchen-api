@@ -28,12 +28,12 @@ async def create_new_user(
         if username_exist.username == user.username:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=ErrorMessages.USERNAME_ALREADY_EXISTS,
+                detail=ErrorMessages.USERNAME_ALREADY_EXISTS_409,
             )
         elif username_exist.email == user.email:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=ErrorMessages.EMAIL_ALREADY_EXISTS,
+                detail=ErrorMessages.EMAIL_ALREADY_EXISTS_409,
             )
 
     user.password = get_password_hash(user.password)

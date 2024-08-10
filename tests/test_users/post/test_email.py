@@ -23,7 +23,7 @@ async def test_email_exist(client):
 
     # Verifique se a requisição foi bem-sucedida
     assert response.status_code == status.HTTP_409_CONFLICT
-    assert response.json() == {'detail': ErrorMessages.EMAIL_ALREADY_EXISTS}
+    assert response.json() == {'detail': ErrorMessages.EMAIL_ALREADY_EXISTS_409}
 
 
 @pytest.mark.asyncio()

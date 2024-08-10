@@ -5,6 +5,7 @@ from mongomock_motor import AsyncMongoMockClient  # type: ignore
 
 from smartkitchien_api.main import app
 from smartkitchien_api.models.user import User
+from smartkitchien_api.schema.faker_user import FakerUser
 from smartkitchien_api.security.security import get_password_hash
 
 # from smartkitchien_api.security.security import get_password_hash
@@ -30,12 +31,13 @@ async def faker_user():
         'username': 'usertest',
         'email': 'usertest@example.com',
         'password': get_password_hash('myS&cret007'),
+        'clean_password': 'myS&cret007',
     }
 
-    await User(**faker_user_data).insert()
+    await FakerUser(**faker_user_data).insert()
 
-    faker_user_db = await User.find(
-        User.username == faker_user_data['username']
+    faker_user_db = await FakerUser.find(
+        FakerUser.username == faker_user_data['username']
     ).first_or_none()
 
     return faker_user_db

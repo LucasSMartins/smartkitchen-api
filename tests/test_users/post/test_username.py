@@ -61,7 +61,7 @@ async def test_username_exist(client):
 
     # Verifique se a requisição foi bem-sucedida
     assert response.status_code == status.HTTP_409_CONFLICT
-    assert response.json() == {'detail': ErrorMessages.USERNAME_ALREADY_EXISTS}  # type: ignore
+    assert response.json() == {'detail': ErrorMessages.USERNAME_ALREADY_EXISTS_409}  # type: ignore
 
 
 @pytest.mark.asyncio()

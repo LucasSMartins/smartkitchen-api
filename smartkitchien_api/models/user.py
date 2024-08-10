@@ -90,6 +90,8 @@ class UserPublic(BaseModel):
     email: EmailStr
     created_at: str | datetime
 
+    # TODO: falta criar o teste desta validação.
+
     @field_validator('created_at')
     def datetime_to_human_readable(cls, created_at_value):
         if isinstance(created_at_value, datetime):

@@ -1,11 +1,18 @@
+from datetime import timedelta
+
 import pytest
-from fastapi import status
+from fastapi import HTTPException, status
+from freezegun import freeze_time
 
-from smartkitchien_api.security.security import validate_jwt
+from smartkitchien_api.messages.error import ErrorMessages
+from smartkitchien_api.schema.token import Token
+from smartkitchien_api.security.security import (
+    create_access_token,
+    get_current_user,
+    validate_jwt,
+)
 
 
-# TODO: Criar um Schema que herda o User mas com o campo
-# senha em claro para usar nesta rota e na fixture token em confest.
 @pytest.mark.asyncio()
 async def test_get_token(client, faker_user):
     response = client.post(
@@ -30,4 +37,87 @@ async def test_get_token_username_or_email_invalid(client):
     )
 
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    assert response.json()['detail'] == 'O email ou senha estão incorretos'  # type: ignore
+    assert response.json()['detail'] == 'O nome de usuário ou senha estão incorretos'  # type: ignore
+
+
+def test_token_expired_after_time(faker_user, client, token):
+    # Cria o usuário em um determinado tempo.
+    with freeze_time('2023-07-14 12:00:00'):
+        response = client.post(
+            '/api/token',
+            data={
+                'username': faker_user.username,
+                'password': faker_user.clean_password,
+            },
+        )
+        assert response.status_code == status.HTTP_201_CREATED
+        token = response.json()['access_token']  # type: ignore
+
+    # Tenta acessar uma rota em que o token já está expirado.
+    with freeze_time('2023-07-14 12:31:00'):
+        response = client.get(
+            f'/api/users/{faker_user.id}', headers={'Authorization': f'Bearer {token}'}
+        )
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.json()['detail'] == ErrorMessages.NOT_VALIDATE_CREDENTIALS_401  # type: ignore
+
+
+@pytest.mark.asyncio()
+async def test_get_current_user_valid_token(token):
+    current_user = await get_current_user(token)
+
+    assert current_user.username == 'usertest'
+
+
+@pytest.mark.asyncio()
+async def test_get_current_user_invalid_token():
+    with pytest.raises(HTTPException) as http_exc:
+        await get_current_user('invalid_token')
+
+    assert http_exc.value.status_code == status.HTTP_401_UNAUTHORIZED
+    assert http_exc.value.detail == ErrorMessages.NOT_VALIDATE_CREDENTIALS_401
+
+
+@pytest.mark.asyncio()
+async def test_get_current_user_invalid_username():
+    # Cria um token sem o payload sub.
+    access_token = create_access_token(payload_data={})
+
+    token = Token(access_token=access_token, token_type='bearer')
+
+    with pytest.raises(HTTPException) as http_exc:
+        await get_current_user(token)
+
+    assert http_exc.value.status_code == status.HTTP_401_UNAUTHORIZED
+    assert http_exc.value.detail == ErrorMessages.NOT_VALIDATE_CREDENTIALS_401
+
+
+@pytest.mark.asyncio()
+async def test_get_current_user_already_existing_username():
+    # Cria um token sem o payload sub.
+    access_token = create_access_token(payload_data={'sub': 'non_existing_usertest'})
+
+    token = Token(access_token=access_token, token_type='bearer')
+
+    with pytest.raises(HTTPException) as http_exc:
+        await get_current_user(token)
+
+    assert http_exc.value.status_code == status.HTTP_401_UNAUTHORIZED
+    assert http_exc.value.detail == ErrorMessages.NOT_VALIDATE_CREDENTIALS_401
+
+
+@pytest.mark.asyncio()
+async def test_get_create_access_token(faker_user):
+    access_token = create_access_token(
+        payload_data={'sub': faker_user.username},
+        expires_delta=timedelta(minutes=30),
+    )
+
+    assert access_token
+
+
+@pytest.mark.asyncio()
+async def test_validate_jwt_invalid(faker_user):
+    is_valid_jwt = validate_jwt('token_invalid')
+
+    assert not is_valid_jwt

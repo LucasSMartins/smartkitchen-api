@@ -1,6 +1,7 @@
 import pytest
 from fastapi import status
 
+from smartkitchien_api.messages.success import SuccessMessages
 from smartkitchien_api.models.user import User
 from smartkitchien_api.security.security import verify_password
 
@@ -18,8 +19,7 @@ async def test_update_username_using_just_username(client, faker_user, token):
 
     assert response.status_code == status.HTTP_200_OK
     assert 'detail' in response.json()
-    assert response.json()['detail']['username'] != faker_user.username  # type: ignore
-    assert response.json()['detail']['username'] == update_faker_user['username']  # type: ignore
+    assert response.json()['detail'] == SuccessMessages.UPDATE_USER
 
 
 @pytest.mark.asyncio()
@@ -35,7 +35,7 @@ async def test_update_email_using_just_email(client, faker_user, token):
 
     assert response.status_code == status.HTTP_200_OK
     assert 'detail' in response.json()
-    assert response.json()['detail']['email'] == update_faker_user['email']  # type: ignore
+    assert response.json()['detail'] == SuccessMessages.UPDATE_USER
 
 
 @pytest.mark.asyncio()
@@ -60,4 +60,5 @@ async def test_update_password_using_just_password(client, faker_user, token):
 
     assert response.status_code == status.HTTP_200_OK
     assert 'detail' in response.json()
+    assert response.json()['detail'] == SuccessMessages.UPDATE_USER
     assert passwords_match
