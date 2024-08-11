@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 from mongomock_motor import AsyncMongoMockClient  # type: ignore
 
 from smartkitchien_api.main import app
+from smartkitchien_api.models.cookbook import Cookbook
 from smartkitchien_api.models.user import User
 from smartkitchien_api.schema.faker_user import FakerUser
 from smartkitchien_api.security.security import get_password_hash
@@ -16,11 +17,14 @@ from smartkitchien_api.security.security import get_password_hash
 @pytest_asyncio.fixture(autouse=True)
 async def init_mongo():
     client = AsyncMongoMockClient()
-    await init_beanie(document_models=[User], database=client.get_database(name='db'))
+    await init_beanie(
+        document_models=[User, Cookbook], database=client.get_database(name='db')
+    )
 
 
 @pytest_asyncio.fixture
 async def client():
+    # client = TestClient(app=app, base_url='/api')
     client = TestClient(app=app)
     return client
 

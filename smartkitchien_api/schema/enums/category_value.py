@@ -43,22 +43,22 @@ class CategoryValue(Enum):
 """
 
 category_description = """
-    === Lista dos valores de cada categoria de alimento ===
-        Pães e Produtos de Panificação = 101,
-        Doces = 102,
-        Produtos Enlatados e Conservas = 103,
-        Materiais de Limpeza = 104,
-        Condimentos e Molhos = 105,
-        Laticínios e Ovos = 106,
-        Bebidas = 107,
-        Congelados = 108,
-        Frutas e Vegetais = 109,
-        Grãos e Cereais = 110,
-        Produtos de Mercearia = 111,
-        Lavanderia = 112,
-        Carne e Peixe = 113,
-        Massas e Produtos de Trigo = 114,
-        Higiene Pessoal = 115,
-        Temperos e Ervas Secas = 116,
-        Papelaria = 117
+    === Lista dos valores de cada categoria de alimento ===\n
+        Pães e Produtos de Panificação = 101,\n
+        Doces = 102,\n
+        Produtos Enlatados e Conservas = 103,\n
+        Materiais de Limpeza = 104,\n
+        Condimentos e Molhos = 105,\n
+        Laticínios e Ovos = 106,\n
+        Bebidas = 107,\n
+        Congelados = 108,\n
+        Frutas e Vegetais = 109,\n
+        Grãos e Cereais = 110,\n
+        Produtos de Mercearia = 111,\n
+        Lavanderia = 112,\n
+        Carne e Peixe = 113,\n
+        Massas e Produtos de Trigo = 114,\n
+        Higiene Pessoal = 115,\n
+        Temperos e Ervas Secas = 116,\n
+        Papelaria = 117\n
     """
