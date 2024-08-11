@@ -1,12 +1,9 @@
 import pytest
-from fastapi import HTTPException, status
+from fastapi import status
 
-from smartkitchien_api.api.routes.cookbook.post import add_item_to_list
 from smartkitchien_api.messages.error import ErrorMessages
 from smartkitchien_api.messages.success import SuccessMessages
 from smartkitchien_api.models.cookbook import Cookbook
-from smartkitchien_api.schema.enums.category_value import CategoryValue
-from smartkitchien_api.schema.recipe import Recipe
 
 
 @pytest.mark.asyncio()
@@ -41,9 +38,9 @@ async def test_create_recipe(client, token, faker_user):
     assert response.status_code == status.HTTP_201_CREATED
     assert response.json() == {'detail': SuccessMessages.RECIPE_CREATED}
     assert cookbook is not None
-    assert len(cookbook.cookbook)  # Verificar se a categoria foi criada
-    assert len(
-        cookbook.cookbook[0].items
+    assert len(cookbook.cookbook) > 0  # Verificar se a categoria foi criada
+    assert (
+        len(cookbook.cookbook[0].items) > 0
     )  # Verificar se a receita foi adicionada à lista da categoria
 
 
@@ -100,6 +97,75 @@ async def test_create_recipe_in_an_existing_category(client, token, faker_user):
     assert len(
         cookbook.cookbook[0].items
     )  # Verificar se a receita foi adicionada à lista da categoria
+
+
+@pytest.mark.asyncio()
+async def test_create_item_recipe_in_an_new_category(client, token, faker_user):
+    recipe_data = {
+        'name': 'Recipe Example',
+        'preparation_time': '01:30',
+        'ingredients': [
+            {'name': 'string', 'quantity': 'string'},
+            {'name': 'string', 'quantity': 'string'},
+        ],
+        'method_preparation': 'String',
+        'portion': 4,
+    }
+
+    recipe_data2 = {
+        'name': 'Recipe Example 2',
+        'preparation_time': '01:30',
+        'ingredients': [
+            {'name': 'string', 'quantity': 'string'},
+            {'name': 'string', 'quantity': 'string'},
+        ],
+        'method_preparation': 'String',
+        'portion': 2,
+    }
+
+    recipe_data3 = {
+        'name': 'Recipe Example 3',
+        'preparation_time': '01:30',
+        'ingredients': [
+            {'name': 'string', 'quantity': 'string'},
+            {'name': 'string', 'quantity': 'string'},
+        ],
+        'method_preparation': 'String',
+        'portion': 2,
+    }
+
+    user_id = faker_user.id
+
+    category_value = '101'
+
+    client.post(
+        f'/api/cookbook/{user_id}/category/{category_value}',
+        headers={'Authorization': f'Bearer {token}'},
+        json=recipe_data,
+    )
+
+    client.post(
+        f'/api/cookbook/{user_id}/category/{category_value}',
+        headers={'Authorization': f'Bearer {token}'},
+        json=recipe_data2,
+    )
+
+    new_category_value = '105'
+
+    response = client.post(
+        f'/api/cookbook/{user_id}/category/{new_category_value}',
+        headers={'Authorization': f'Bearer {token}'},
+        json=recipe_data3,
+    )
+
+    cookbook = await Cookbook.find(Cookbook.user_id == faker_user.id).first_or_none()
+
+    assert response.status_code == status.HTTP_201_CREATED
+    assert response.json() == {'detail': SuccessMessages.RECIPE_CREATED}
+    assert cookbook is not None
+    assert len(cookbook.cookbook) > 1  # list of categories
+    assert len(cookbook.cookbook[0].items) > 1  # category 101
+    assert len(cookbook.cookbook[1].items) > 0  # new category 105
 
 
 # @ ==================== TESTES DE ERROR ======================

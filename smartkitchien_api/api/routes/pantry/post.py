@@ -79,7 +79,9 @@ async def get_pantry_collection(current_user_id: PydanticObjectId):
 
 
 @router.post(
-    '/{user_id}', status_code=status.HTTP_201_CREATED, description=category_description
+    '/{user_id}/category/{category_value}',
+    status_code=status.HTTP_201_CREATED,
+    description=category_description,
 )
 async def create_item_pantry(
     user_id: PydanticObjectId,
