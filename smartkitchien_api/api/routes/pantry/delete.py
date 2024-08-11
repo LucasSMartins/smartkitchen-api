@@ -15,7 +15,10 @@ from smartkitchien_api.security.security import get_current_user
 router = APIRouter()
 
 
-@router.delete('/')
+@router.delete(
+    '/{user_id}/category/{category_value}/item/{item_id}',
+    status_code=status.HTTP_200_OK,
+)
 async def delete_item(
     user_id: PydanticObjectId,
     item_id: PydanticObjectId,

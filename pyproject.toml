@@ -54,7 +54,7 @@ format = 'ruff check . --fix && ruff format .'
 run = 'fastapi dev smartkitchien_api/main.py'
 pre_test = 'task lint'
 post_test = 'coverage html'
-test = 'pytest -s -x --cov=smartkitchien_api -vv'
+test = 'pytest -s --cov=smartkitchien_api -vv'
 # O -x no pytest faz com que o teste pare no primeiro error.
 # O -s mostra as saídas no console, bom para usar print().
 # O --pdb entra em modo DEBBUG
