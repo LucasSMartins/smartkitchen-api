@@ -15,8 +15,8 @@ from smartkitchien_api.security.security import verify_password
 async def test_create_user(client):
     # Crie um novo usuário
     new_user = {
-        'username': 'usertest',
-        'email': 'usertest@example.com',
+        'username': 'testuser',
+        'email': 'testuser@example.com',
         'password': 'myS&cret007',
     }
 
@@ -46,14 +46,14 @@ async def test_create_user(client):
 @pytest.mark.asyncio()
 async def test_username_exist(client):
     new_user = {
-        'username': 'usertest',
+        'username': 'testuser',
         'email': 'user_test@example.com',
         'password': 'myS&cret007',
     }
 
     # Crie um usuário existente
     await User(
-        username='usertest', email='usertest@example.com', password='myS&cret007'
+        username='testuser', email='testuser@example.com', password='myS&cret007'
     ).create()
 
     # Faça uma requisição POST para a rota de criação de usuário
@@ -67,7 +67,7 @@ async def test_username_exist(client):
 @pytest.mark.asyncio()
 async def test_required_field_username(client):
     new_user = {
-        'email': 'usertest@example.com',
+        'email': 'testuser@example.com',
         'password': 'myS&cret007',
     }
     response = client.post('/api/users', json=new_user)
@@ -83,7 +83,7 @@ async def test_required_field_username(client):
 async def test_username_validation_lt_3_characters(client):
     new_user = {
         'username': 'us',
-        'email': 'usertest@example.com',
+        'email': 'testuser@example.com',
         'password': 'myS&cret007',
     }
 
@@ -99,8 +99,8 @@ async def test_username_validation_lt_3_characters(client):
 @pytest.mark.asyncio()
 async def test_username_validation_gt_16_characters(client):
     new_user = {
-        'username': 'usertest_usertest_usertest_usertest',
-        'email': 'usertest@example.com',
+        'username': 'testuser_testuser_testuser_testuser',
+        'email': 'testuser@example.com',
         'password': 'myS&cret007',
     }
 
@@ -116,8 +116,8 @@ async def test_username_validation_gt_16_characters(client):
 @pytest.mark.asyncio()
 async def test_username_validation_must_not_contain_special_characters(client):
     new_user = {
-        'username': 'usertest#',
-        'email': 'usertest@example.com',
+        'username': 'testuser#',
+        'email': 'testuser@example.com',
         'password': 'myS&cret007',
     }
 
@@ -135,8 +135,8 @@ async def test_username_validation_must_not_contain_more_3_repeated_characters_s
     client,
 ):  # noqa: E501
     new_user = {
-        'username': 'uuuuusertest',
-        'email': 'usertest@example.com',
+        'username': 'uuuutestuser',
+        'email': 'testuser@example.com',
         'password': 'myS&cret007',
     }
 

@@ -48,8 +48,10 @@ async def test_delete_with_user_id_invalid(client, token):
 
 @pytest.mark.asyncio()
 async def test_delete_non_existent_user(client, token):
+    user_id_not_existing = '5eb7cf5a86d9755df3a6c593'
+
     response = client.delete(
-        '/api/users/5eb7cf5a86d9755df3a6c593',
+        f'/api/users/{user_id_not_existing}',
         headers={'Authorization': f'Bearer {token}'},
     )
 

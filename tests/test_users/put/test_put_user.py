@@ -9,7 +9,7 @@ from smartkitchien_api.security.security import verify_password
 
 @pytest.mark.asyncio()
 async def test_update_username_using_just_username(client, faker_user, token):
-    update_faker_user = {'username': 'new_usertest'}
+    update_faker_user = {'username': 'new_testuser'}
     headers = {'Authorization': f'Bearer {token}'}
 
     response = client.put(
@@ -25,7 +25,7 @@ async def test_update_username_using_just_username(client, faker_user, token):
 
 @pytest.mark.asyncio()
 async def test_update_email_using_just_email(client, faker_user, token):
-    update_faker_user = {'email': 'new_usertest@example.com'}
+    update_faker_user = {'email': 'new_testuser@example.com'}
     headers = {'Authorization': f'Bearer {token}'}
 
     response = client.put(
@@ -72,7 +72,7 @@ async def test_update_password_using_just_password(client, faker_user, token):
 async def test_update_data_without_token_should_return_401_unauthenticated(
     client, faker_user
 ):
-    update_faker_user = {'username': 'user_test'}
+    update_faker_user = {'username': 'test_user'}
 
     response = client.put(
         f'/api/users/{faker_user.id}',
@@ -88,7 +88,7 @@ async def test_update_data_without_token_should_return_401_unauthenticated(
 async def test_update_data_with_token_invalid_should_return_401_unauthenticated(
     client, faker_user
 ):
-    update_faker_user = {'username': 'user_test'}
+    update_faker_user = {'username': 'test_user'}
 
     headers = {'Authorization': 'Bearer token_invalid'}
 
@@ -105,7 +105,7 @@ async def test_update_data_with_token_invalid_should_return_401_unauthenticated(
 async def test_updates_existing_username_should_return_409_conflict_error(
     client, token, faker_user
 ):
-    update_faker_user = {'username': 'usertest'}
+    update_faker_user = {'username': 'testuser'}
 
     headers = {'Authorization': f'Bearer {token}'}
 
@@ -122,7 +122,7 @@ async def test_updates_existing_username_should_return_409_conflict_error(
 async def test_updates_existing_email_should_return_409_conflict_error(
     client, token, faker_user
 ):
-    update_faker_user = {'email': 'usertest@example.com'}
+    update_faker_user = {'email': 'testuser@example.com'}
 
     headers = {'Authorization': f'Bearer {token}'}
 
@@ -299,7 +299,7 @@ async def test_username_must_only_contain_letters_numbers_underscores_or_periods
 async def test_updating_username_must_not_contain_excessive_repetition_characters(
     client, token, faker_user
 ):
-    new_username = {'username': 'uuuuuusertest'}
+    new_username = {'username': 'uuuuutestuser'}
 
     headers = {'Authorization': f'Bearer {token}'}
 

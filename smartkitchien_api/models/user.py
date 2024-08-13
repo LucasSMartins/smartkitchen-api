@@ -100,7 +100,7 @@ class UserPublic(BaseModel):
 
 
 user_example = {
-    'username': 'usertest',
-    'email': 'usertest@example.com',
+    'username': 'testuser',
+    'email': 'testuser@example.com',
     'password': 'myS&cret007',
 }

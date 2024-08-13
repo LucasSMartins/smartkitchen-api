@@ -33,7 +33,7 @@ async def test_get_token(client, faker_user):
 async def test_get_token_username_or_email_invalid(client):
     response = client.post(
         '/api/token',
-        data={'username': 'usertest_abcde', 'password': 'myS&cret007_12345'},
+        data={'username': 'testuser_abcde', 'password': 'myS&cret007_12345'},
     )
 
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -66,7 +66,7 @@ def test_token_expired_after_time(faker_user, client, token):
 async def test_get_current_user_valid_token(token):
     current_user = await get_current_user(token)
 
-    assert current_user.username == 'usertest'
+    assert current_user.username == 'testuser'
 
 
 @pytest.mark.asyncio()
@@ -95,7 +95,7 @@ async def test_get_current_user_invalid_username():
 @pytest.mark.asyncio()
 async def test_get_current_user_already_existing_username():
     # Cria um token sem o payload sub.
-    access_token = create_access_token(payload_data={'sub': 'non_existing_usertest'})
+    access_token = create_access_token(payload_data={'sub': 'non_existing_testuser'})
 
     token = Token(access_token=access_token, token_type='bearer')
 

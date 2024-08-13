@@ -10,10 +10,10 @@ from smartkitchien_api.security.security import get_password_hash
 async def test_read_all_users_and_returns_list_users(client):
     pwd_hash = get_password_hash('myS&cret007')
     users = [
-        User(username='usertest1', email='usertest1@example.com', password=pwd_hash),
+        User(username='testuser1', email='testuser1@example.com', password=pwd_hash),
         User(
-            username='usertest2',
-            email='usertest2@example.com',
+            username='testuser2',
+            email='testuser2@example.com',
             password=pwd_hash,
         ),
     ]

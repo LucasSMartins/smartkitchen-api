@@ -31,8 +31,8 @@ async def client():
 @pytest_asyncio.fixture()
 async def faker_user():
     faker_user_data = {
-        'username': 'usertest',
-        'email': 'usertest@example.com',
+        'username': 'testuser',
+        'email': 'testuser@example.com',
         'password': get_password_hash('myS&cret007'),
         'clean_password': 'myS&cret007',
     }
@@ -49,8 +49,8 @@ async def faker_user():
 @pytest_asyncio.fixture()
 async def another_faker_user():
     faker_user_data = {
-        'username': 'usertest2',
-        'email': 'usertest2@example.com',
+        'username': 'testuser2',
+        'email': 'testuser2@example.com',
         'password': get_password_hash('myS&cret007'),
     }
 

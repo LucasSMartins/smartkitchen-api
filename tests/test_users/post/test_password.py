@@ -5,8 +5,8 @@ from fastapi import status
 @pytest.mark.asyncio()
 async def test_required_field_password(client):
     new_user = {
-        'username': 'usertest',
-        'email': 'usertest@example.com',
+        'username': 'testuser',
+        'email': 'testuser@example.com',
     }
 
     response = client.post('/api/users', json=new_user)
@@ -21,8 +21,8 @@ async def test_required_field_password(client):
 @pytest.mark.asyncio()
 async def test_password_validation_lt_8(client):
     new_user = {
-        'username': 'usertest',
-        'email': 'usertest@example.com',
+        'username': 'testuser',
+        'email': 'testuser@example.com',
         'password': 'my',
     }
 
@@ -38,8 +38,8 @@ async def test_password_validation_lt_8(client):
 @pytest.mark.asyncio()
 async def test_password_validation_must_contain_character_uppercase(client):
     new_user = {
-        'username': 'usertest',
-        'email': 'usertest@example.com',
+        'username': 'testuser',
+        'email': 'testuser@example.com',
         'password': 'mysecret',
     }
 
@@ -53,12 +53,12 @@ async def test_password_validation_must_contain_character_uppercase(client):
 
 
 @pytest.mark.asyncio()
-async def test_password_validatest_password_must_contain_least_one_lowercase_letter(
+async def test_password_validate_password_must_contain_least_one_lowercase_letter(
     client,
 ):
     new_user = {
-        'username': 'usertest',
-        'email': 'usertest@example.com',
+        'username': 'testuser',
+        'email': 'testuser@example.com',
         'password': 'MYS&CRET007',
     }
 
@@ -74,8 +74,8 @@ async def test_password_validatest_password_must_contain_least_one_lowercase_let
 @pytest.mark.asyncio()
 async def test_password_validation_must_contain_special_character(client):
     new_user = {
-        'username': 'usertest',
-        'email': 'usertest@example.com',
+        'username': 'testuser',
+        'email': 'testuser@example.com',
         'password': 'mySecret',
     }
 
@@ -91,8 +91,8 @@ async def test_password_validation_must_contain_special_character(client):
 @pytest.mark.asyncio()
 async def test_password_validation_must_contain_number(client):
     new_user = {
-        'username': 'usertest',
-        'email': 'usertest@example.com',
+        'username': 'testuser',
+        'email': 'testuser@example.com',
         'password': 'myS&cret',
     }
 

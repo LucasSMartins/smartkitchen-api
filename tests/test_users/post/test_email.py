@@ -8,14 +8,14 @@ from smartkitchien_api.models.user import User
 @pytest.mark.asyncio()
 async def test_email_exist(client):
     new_user = {
-        'username': 'usertest_email',
-        'email': 'usertest@example.com',
+        'username': 'testuser_email',
+        'email': 'testuser@example.com',
         'password': 'myS&cret007',
     }
 
     # Crie um usuário existente
     await User(
-        username='usertest', email='usertest@example.com', password='myS&cret007'
+        username='testuser', email='testuser@example.com', password='myS&cret007'
     ).create()
 
     # Faça uma requisição POST para a rota de criação de usuário
@@ -29,7 +29,7 @@ async def test_email_exist(client):
 @pytest.mark.asyncio()
 async def test_required_field_email(client):
     new_user = {
-        'username': 'usertest',
+        'username': 'testuser',
         'password': 'myS&cret007',
     }
     response = client.post('/api/users', json=new_user)
@@ -44,8 +44,8 @@ async def test_required_field_email(client):
 @pytest.mark.asyncio()
 async def test_email_validation_without_at_sign(client):
     new_user = {
-        'username': 'usertest',
-        'email': 'usertestexample.com',
+        'username': 'testuser',
+        'email': 'testuserexample.com',
         'password': 'myS&cret007',
     }
 
@@ -61,8 +61,8 @@ async def test_email_validation_without_at_sign(client):
 @pytest.mark.asyncio()
 async def test_email_validation_with_space(client):
     new_user = {
-        'username': 'usertest',
-        'email': 'usertest @example.com',
+        'username': 'testuser',
+        'email': 'testuser @example.com',
         'password': 'myS&cret007',
     }
 
@@ -78,8 +78,8 @@ async def test_email_validation_with_space(client):
 @pytest.mark.asyncio()
 async def test_email_validation_with_invalid_character(client):
     new_user = {
-        'username': 'usertest',
-        'email': 'usertest@example!.com',
+        'username': 'testuser',
+        'email': 'testuser@example!.com',
         'password': 'myS&cret007',
     }
 
@@ -95,8 +95,8 @@ async def test_email_validation_with_invalid_character(client):
 @pytest.mark.asyncio()
 async def test_email_validation_without_domain(client):
     new_user = {
-        'username': 'usertest',
-        'email': 'usertest@',
+        'username': 'testuser',
+        'email': 'testuser@',
         'password': 'myS&cret007',
     }
 
@@ -112,8 +112,8 @@ async def test_email_validation_without_domain(client):
 @pytest.mark.asyncio()
 async def test_email_validation_with_invalid_domain(client):
     new_user = {
-        'username': 'usertest',
-        'email': 'usertest@example.invalid',
+        'username': 'testuser',
+        'email': 'testuser@example.invalid',
         'password': 'myS&cret007',
     }
 
@@ -129,8 +129,8 @@ async def test_email_validation_with_invalid_domain(client):
 @pytest.mark.asyncio()
 async def test_email_validation_with_multiple_at(client):
     new_user = {
-        'username': 'usertest',
-        'email': 'usertest@example.com@example.com',
+        'username': 'testuser',
+        'email': 'testuser@example.com@example.com',
         'password': 'myS&cret007',
     }
 
@@ -146,8 +146,8 @@ async def test_email_validation_with_multiple_at(client):
 @pytest.mark.asyncio()
 async def test_email_validation_with_non_allowed_character(client):
     new_user = {
-        'username': 'usertest',
-        'email': 'usertest@example.com£',
+        'username': 'testuser',
+        'email': 'testuser@example.com£',
         'password': 'myS&cret007',
     }
 
