@@ -48,26 +48,44 @@ async def faker_user():
 
 @pytest_asyncio.fixture()
 async def another_faker_user():
-    faker_user_data = {
+    another_faker_user_data = {
         'username': 'testuser2',
         'email': 'testuser2@example.com',
         'password': get_password_hash('myS&cret007'),
+        'clean_password': 'myS&cret007',
     }
 
-    await User(**faker_user_data).insert()
+    await FakerUser(**another_faker_user_data).insert()
 
-    faker_user_db = await User.find(
-        User.username == faker_user_data['username']
+    another_faker_user_db = await FakerUser.find(
+        FakerUser.username == another_faker_user_data['username']
     ).first_or_none()
 
-    return faker_user_db
+    return another_faker_user_db
 
 
 @pytest_asyncio.fixture()
-def token(client, faker_user):
+async def token(client: TestClient, faker_user: FakerUser):
     response = client.post(
         '/api/token',
-        data={'username': faker_user.username, 'password': 'myS&cret007'},
+        data={'username': faker_user.username, 'password': faker_user.clean_password},
     )
 
-    return response.json()['access_token']  # type: ignore
+    return response.json()['access_token']
+
+
+@pytest_asyncio.fixture()
+async def headers(token):
+    return {'Authorization': f'Bearer {token}'}
+
+
+@pytest_asyncio.fixture()
+async def create_pantry(client: TestClient, faker_user: FakerUser, headers: dict):
+    category_value = '101'
+    item = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
+
+    client.post(
+        f'/api/pantry/{faker_user.id}/category/{category_value}',
+        headers=headers,
+        json=item,
+    )
