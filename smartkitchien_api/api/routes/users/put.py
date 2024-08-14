@@ -4,10 +4,14 @@ from beanie import PydanticObjectId
 from beanie.operators import Set
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
-from smartkitchien_api.messages.error import ErrorMessages
-from smartkitchien_api.messages.success import SuccessMessages
+from smartkitchien_api.messages.users import InformationUsers
 from smartkitchien_api.middleware.check_user_permission import check_user_permission
 from smartkitchien_api.models.user import User, UserUpdate, user_example
+from smartkitchien_api.schema.standard_answer import (
+    AnswerDetail,
+    DefaultAnswer,
+    TypeAnswers,
+)
 from smartkitchien_api.security.security import get_current_user, get_password_hash
 
 router = APIRouter()
@@ -16,27 +20,41 @@ router = APIRouter()
 @router.put(
     '/{user_id}',
     status_code=status.HTTP_200_OK,
-    response_model=dict,
+    response_model=DefaultAnswer,
 )
 async def update_user(
     user_id: PydanticObjectId,
     current_user: Annotated[User, Depends(get_current_user)],
     update_user: UserUpdate = Body(example=user_example),
 ):
-    check_user_permission(current_user.id, user_id)  # type: ignore
+    check_user_permission(current_user.id, user_id)
 
     username_exist = await User.get(user_id)
 
     if username_exist:
         if username_exist.username == update_user.username:
+            detail = AnswerDetail(
+                status=status.HTTP_409_CONFLICT,
+                type=TypeAnswers.CONFLICT,
+                title=InformationUsers.USERNAME_ALREADY_EXISTS['title'],
+                msg=InformationUsers.USERNAME_ALREADY_EXISTS['msg'],
+                loc=InformationUsers.USERNAME_ALREADY_EXISTS['loc'],
+            )
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=ErrorMessages.USERNAME_ALREADY_EXISTS_409,
+                detail=detail.model_dump(),
             )
         elif username_exist.email == update_user.email:
+            detail = AnswerDetail(
+                status=status.HTTP_409_CONFLICT,
+                type=TypeAnswers.CONFLICT,
+                title=InformationUsers.EMAIL_ALREADY_EXISTS['title'],
+                msg=InformationUsers.EMAIL_ALREADY_EXISTS['msg'],
+                loc=InformationUsers.EMAIL_ALREADY_EXISTS['loc'],
+            )
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=ErrorMessages.EMAIL_ALREADY_EXISTS_409,
+                detail=detail.model_dump(),
             )
 
     if update_user.password:
@@ -47,4 +65,11 @@ async def update_user(
 
     await current_user.update(Set(update_user_data))
 
-    return {'detail': SuccessMessages.UPDATE_USER}
+    detail = AnswerDetail(
+        status=status.HTTP_200_OK,
+        type=TypeAnswers.SUCCESS,
+        title=InformationUsers.USER_UPDATED['title'],
+        msg=InformationUsers.USER_UPDATED['msg'],
+    )
+
+    return DefaultAnswer(detail=detail)

@@ -3,7 +3,7 @@ from typing import Annotated
 from beanie import PydanticObjectId
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
-from smartkitchien_api.messages.error import ErrorMessages
+from smartkitchien_api.messages.shopping_cart import InformationShoppingCart
 from smartkitchien_api.middleware.check_user_permission import check_user_permission
 from smartkitchien_api.models.shopping_cart import (
     ShoppingCart,
@@ -14,13 +14,21 @@ from smartkitchien_api.models.user import User
 from smartkitchien_api.schema.categories import CategoryValue
 from smartkitchien_api.schema.enums.category_value import category_description
 from smartkitchien_api.schema.items import ItemsUpdate
+from smartkitchien_api.schema.standard_answer import (
+    AnswerDetail,
+    DefaultAnswer,
+    TypeAnswers,
+)
 from smartkitchien_api.security.security import get_current_user
 
 router = APIRouter()
 
 
 @router.put(
-    '/{user_id}', status_code=status.HTTP_200_OK, description=category_description
+    '/{user_id}/item/{item_id}/category/{category_value}',
+    status_code=status.HTTP_200_OK,
+    description=category_description,
+    response_model=DefaultAnswer,
 )
 async def update_item_shopping_cart(
     user_id: PydanticObjectId,
@@ -31,16 +39,22 @@ async def update_item_shopping_cart(
         example=item_with_price,
     ),
 ):
-    check_user_permission(current_user.id, user_id)  # type: ignore
-
+    check_user_permission(current_user.id, user_id)
     user_shopping_cart = await ShoppingCart.find(
         ShoppingCart.user_id == user_id
     ).first_or_none()
 
     if not user_shopping_cart:
+        detail = AnswerDetail(
+            status=status.HTTP_404_NOT_FOUND,
+            type=TypeAnswers.NOT_FOUND,
+            title=InformationShoppingCart.CART_NOT_FOUND['title'],
+            msg=InformationShoppingCart.CART_NOT_FOUND['msg'],
+            loc=InformationShoppingCart.CART_NOT_FOUND['loc'],
+        )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=ErrorMessages.PANTRY_NOT_FOUND,
+            detail=detail.model_dump(),
         )
 
     # Procura o item e atualiza-o na categoria correspondente
@@ -62,17 +76,39 @@ async def update_item_shopping_cart(
                 break
 
     if not category_found:
+        detail = AnswerDetail(
+            status=status.HTTP_404_NOT_FOUND,
+            type=TypeAnswers.NOT_FOUND,
+            title=InformationShoppingCart.CATEGORY_NOT_FOUND['title'],
+            msg=InformationShoppingCart.CATEGORY_NOT_FOUND['msg'],
+            loc=InformationShoppingCart.CATEGORY_NOT_FOUND['loc'],
+        )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=ErrorMessages.CATEGORY_NOT_FOUND,
+            detail=detail.model_dump(),
         )
 
     if not item_found:
+        detail = AnswerDetail(
+            status=status.HTTP_404_NOT_FOUND,
+            type=TypeAnswers.NOT_FOUND,
+            title=InformationShoppingCart.ITEM_NOT_FOUND['title'],
+            msg=InformationShoppingCart.ITEM_NOT_FOUND['msg'],
+            loc=InformationShoppingCart.ITEM_NOT_FOUND['loc'],
+        )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=ErrorMessages.ITEM_NOT_FOUND,
+            detail=detail.model_dump(),
         )
 
     await user_shopping_cart.save()
 
-    return ShoppingCartPublic(**user_shopping_cart.model_dump())
+    detail = AnswerDetail(
+        status=status.HTTP_200_OK,
+        type=TypeAnswers.SUCCESS,
+        title=InformationShoppingCart.ITEM_UPDATED['title'],
+        msg=InformationShoppingCart.ITEM_UPDATED['msg'],
+        data=ShoppingCartPublic(**user_shopping_cart.model_dump()),
+    )
+
+    return DefaultAnswer(detail=detail)

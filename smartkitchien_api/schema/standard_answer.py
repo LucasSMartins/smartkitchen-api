@@ -1,34 +1,43 @@
+from typing import Any
+
 from pydantic import BaseModel, Field
 
-"""
-    {
-        "type": "error_validation",
-        "title": "Erro de validação",
-        "status": 400,
-        "detail": "Um ou mais campos do formulário estão inválidos.",
-        "instance": "/usuarios/novo"
-    }
-"""
+
+class TypeAnswers(BaseModel):
+    SUCCESS: str = 'success'
+    BAD_REQUEST: str = 'bad_request'
+    NOT_FOUND: str = 'not_found'
+    INTERNAL_SERVER_ERROR: str = 'internal_server_error'
+    CONFLICT: str = 'conflict'
+    UNAUTHORIZED: str = 'unauthorized'
+    FORBIDDEN: str = 'forbidden'
+    PAYMENT_REQUIRED: str = 'payment_required'
+    TOO_MANY_REQUESTS: str = 'too_many_requests'
+    REQUEST_TIMEOUT: str = 'request_timeout'
 
 
-class ValidationError(BaseModel):
+class AnswerDetail(BaseModel):
     type: str = Field(...)
     title: str = Field(...)
     status: int = Field(...)
-    detail: str = Field(...)
+    msg: str = Field(...)
+    loc: list[str] | None = None
     instance: str | None = None
+    data: Any | None = None
+    """
+        Exemplo de como deve ser a resposta da api
+        deve ser usado entre 400 e 500
+        {
+            "type": "error_validation",
+            "title": "Erro de validação",
+            "status": 400,
+            "loc": ['path|body|etc...', 'user_id|etc...'],
+            "msg": Um ou mais campos do formulário estão inválidos"
+            },
+            "instance": "/usuarios/novo"
+        }
+    """
 
 
-class TypesErrorEmail(BaseModel):
-    REQUIRED_FIELD_EMAIL: str = 'O campo email está faltando.'
-
-    EMAIL_WITHOUT_AT_SIGN: str = 'O email esta sem o, @ arroba.'
-    EMAIL_WITHOUT_DOMAIN: str = 'O email esta sem o domínio.'
-    EMAIL_WITHOUT_EXTENSION: str = 'O email esta sem a extensão.'
-    EMAIL_WITHOUT_CHARACTERS: str = 'O email esta sem vazio.'
-
-    EMAIL_WITH_MULTIPLE_AT_SIGN: str = 'O email está com multiplos @ arrobas.'
-    EMAIL_WITH_INVALID_CHARACTER: str = 'O email está com caracters inválidos'
-    EMAIL_WITH_SPACE: str = 'O email não pode conter espaços'
-    EMAIL_WITH_INVALID_DOMAIN: str = 'O email está com o dominio inválido.'
-    EMAIL_WITH_NON_ALLOWED_CHARACTER: str = 'O email contém caracteres não permitidos'
+class DefaultAnswer(BaseModel):
+    detail: AnswerDetail

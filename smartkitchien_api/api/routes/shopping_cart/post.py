@@ -4,9 +4,8 @@ from beanie import PydanticObjectId
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from pymongo.errors import PyMongoError
 
-from smartkitchien_api.messages.error import ErrorMessages
-from smartkitchien_api.messages.generic import GenericErrorMessages
-from smartkitchien_api.messages.success import SuccessMessages
+from smartkitchien_api.messages.generic import InformationGeneric
+from smartkitchien_api.messages.shopping_cart import InformationShoppingCart
 from smartkitchien_api.middleware.check_user_permission import check_user_permission
 from smartkitchien_api.models.shopping_cart import (
     ShoppingCart,
@@ -23,6 +22,11 @@ from smartkitchien_api.schema.enums.category_value import (
     category_description,
 )
 from smartkitchien_api.schema.items import Items
+from smartkitchien_api.schema.standard_answer import (
+    AnswerDetail,
+    DefaultAnswer,
+    TypeAnswers,
+)
 from smartkitchien_api.security.security import get_current_user
 
 router = APIRouter()
@@ -49,9 +53,16 @@ async def add_item_to_list(
             # Verifica se já existe um item com o mesmo nome,
             # Se algum valor da lista for verdadeiro (true) a função Any retorna True
             if any(existing_item.name == item.name for existing_item in category.items):
+                detail = AnswerDetail(
+                    status=status.HTTP_409_CONFLICT,
+                    type=TypeAnswers.CONFLICT,
+                    title=InformationShoppingCart.ITEM_ALREADY_EXISTS['title'],
+                    msg=InformationShoppingCart.ITEM_ALREADY_EXISTS['msg'],
+                    loc=InformationShoppingCart.ITEM_ALREADY_EXISTS['loc'],
+                )
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
-                    detail=ErrorMessages.ITEM_ALREADY_EXISTS,
+                    detail=detail.model_dump(),
                 )
 
             category.items.append(item)
@@ -60,9 +71,16 @@ async def add_item_to_list(
 
             return
 
+    detail = AnswerDetail(
+        status=status.HTTP_404_NOT_FOUND,
+        type=TypeAnswers.NOT_FOUND,
+        title=InformationShoppingCart.CATEGORY_NOT_FOUND['title'],
+        msg=InformationShoppingCart.CATEGORY_NOT_FOUND['msg'],
+        loc=InformationShoppingCart.CATEGORY_NOT_FOUND['loc'],
+    )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=ErrorMessages.CATEGORY_NOT_FOUND,
+        detail=detail.model_dump(),
     )
 
 
@@ -76,14 +94,23 @@ async def get_shopping_cart_collection(current_user_id: PydanticObjectId):
         # TODO: Log ou exiba uma mensagem de erro apropriada
         print(f'Erro ao consultar o banco de dados: {e}')
         # Ou lançar uma exceção personalizada se necessário
+        detail = AnswerDetail(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            type=TypeAnswers.INTERNAL_SERVER_ERROR,
+            title=InformationGeneric.INTERNAL_SERVER_ERROR['title'],
+            msg=InformationGeneric.INTERNAL_SERVER_ERROR['msg'],
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=GenericErrorMessages.INTERNAL_SERVER_ERROR_500,
+            detail=detail.model_dump(),
         )
 
 
 @router.post(
-    '/{user_id}', status_code=status.HTTP_201_CREATED, description=category_description
+    '/{user_id}/category/{category_value}',
+    status_code=status.HTTP_201_CREATED,
+    description=category_description,
+    response_model=DefaultAnswer,
 )
 async def create_item_shopping_cart(
     user_id: PydanticObjectId,
@@ -93,9 +120,9 @@ async def create_item_shopping_cart(
         examples=[item_with_price, item_without_price], description=item_description
     ),
 ):
-    check_user_permission(current_user.id, user_id)  # type: ignore
+    check_user_permission(current_user.id, user_id)
 
-    shopping_cart_collection = await get_shopping_cart_collection(current_user.id)  # type: ignore
+    shopping_cart_collection = await get_shopping_cart_collection(user_id)
 
     if not shopping_cart_collection:
         # Cria o um Document shopping_cart na collection shopping_cart.
@@ -117,4 +144,11 @@ async def create_item_shopping_cart(
 
         await add_item_to_list(shopping_cart_collection, category_value, item)
 
-    return {'detail': SuccessMessages.ITEM_ADDED}
+    detail = AnswerDetail(
+        status=status.HTTP_201_CREATED,
+        type=TypeAnswers.SUCCESS,
+        title=InformationShoppingCart.ITEM_ADDED['title'],
+        msg=InformationShoppingCart.ITEM_ADDED['msg'],
+    )
+
+    return DefaultAnswer(detail=detail)

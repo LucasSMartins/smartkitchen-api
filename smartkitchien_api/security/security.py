@@ -8,8 +8,9 @@ from jwt.exceptions import InvalidTokenError
 from pwdlib import PasswordHash
 
 from smartkitchien_api.config.settings import setting
-from smartkitchien_api.messages.error import ErrorMessages
+from smartkitchien_api.messages.generic import InformationGeneric
 from smartkitchien_api.models.user import User
+from smartkitchien_api.schema.standard_answer import AnswerDetail, TypeAnswers
 
 # https://polar.sh/frankie567/posts/introducing-pwdlib-a-modern-password-hash-helper-for-python
 
@@ -44,6 +45,13 @@ def create_access_token(payload_data: dict, expires_delta: timedelta | None = No
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     try:
+        detail = AnswerDetail(
+            status=status.HTTP_401_UNAUTHORIZED,
+            type=TypeAnswers.UNAUTHORIZED,
+            title=InformationGeneric.UNAUTHORIZED['title'],
+            msg=InformationGeneric.UNAUTHORIZED['msg'],
+        )
+
         payload = decode(token, setting.SECRET_KEY, algorithms=[setting.ALGORITHM])
 
         username: str = payload.get('sub')
@@ -51,13 +59,13 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         if not username:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=ErrorMessages.NOT_VALIDATE_CREDENTIALS_401,
+                detail=detail.model_dump(),
                 headers={'WWW-Authenticate': 'Bearer'},
             )
     except InvalidTokenError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=ErrorMessages.NOT_VALIDATE_CREDENTIALS_401,
+            detail=detail.model_dump(),
             headers={'WWW-Authenticate': 'Bearer'},
         )
 
@@ -66,7 +74,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=ErrorMessages.NOT_VALIDATE_CREDENTIALS_401,
+            detail=detail.model_dump(),
             headers={'WWW-Authenticate': 'Bearer'},
         )
 
