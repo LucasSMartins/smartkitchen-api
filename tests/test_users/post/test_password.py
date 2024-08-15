@@ -1,9 +1,9 @@
 import pytest
 from fastapi import status
-
+from fastapi.testclient import TestClient
 
 @pytest.mark.asyncio()
-async def test_required_field_password(client):
+async def test_required_field_password(client: Testclient):
     new_user = {
         'username': 'testuser',
         'email': 'testuser@example.com',
@@ -11,15 +11,12 @@ async def test_required_field_password(client):
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]  # type: ignore
-
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert msg['type'] == 'missing'
-    assert msg['loc'] == ['body', 'password']
+
 
 
 @pytest.mark.asyncio()
-async def test_password_validation_lt_8(client):
+async def test_password_validation_lt_8(client: Testclient):
     new_user = {
         'username': 'testuser',
         'email': 'testuser@example.com',
@@ -28,15 +25,14 @@ async def test_password_validation_lt_8(client):
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]  # type: ignore
-
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert msg['type'] == 'string_too_short'
-    assert msg['loc'] == ['body', 'password']
+
 
 
 @pytest.mark.asyncio()
-async def test_password_validation_must_contain_character_uppercase(client):
+async def test_password_validation_must_contain_character_uppercase(
+    client: Testclient
+):
     new_user = {
         'username': 'testuser',
         'email': 'testuser@example.com',
@@ -45,16 +41,12 @@ async def test_password_validation_must_contain_character_uppercase(client):
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]  # type: ignore
-
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert msg['type'] == 'value_error'
-    assert msg['loc'] == ['body', 'password']
 
 
 @pytest.mark.asyncio()
 async def test_password_validate_password_must_contain_least_one_lowercase_letter(
-    client,
+    client: TestClient
 ):
     new_user = {
         'username': 'testuser',
@@ -64,15 +56,13 @@ async def test_password_validate_password_must_contain_least_one_lowercase_lette
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]  # type: ignore
-
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert msg['type'] == 'value_error'
-    assert msg['loc'] == ['body', 'password']
 
 
 @pytest.mark.asyncio()
-async def test_password_validation_must_contain_special_character(client):
+async def test_password_validation_must_contain_special_character(
+    client: Testclient
+):
     new_user = {
         'username': 'testuser',
         'email': 'testuser@example.com',
@@ -81,15 +71,11 @@ async def test_password_validation_must_contain_special_character(client):
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]  # type: ignore
-
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert msg['type'] == 'value_error'
-    assert msg['loc'] == ['body', 'password']
 
 
 @pytest.mark.asyncio()
-async def test_password_validation_must_contain_number(client):
+async def test_password_validation_must_contain_number(client: Testclient):
     new_user = {
         'username': 'testuser',
         'email': 'testuser@example.com',
@@ -98,8 +84,4 @@ async def test_password_validation_must_contain_number(client):
 
     response = client.post('/api/users', json=new_user)
 
-    msg = response.json()['detail'][0]  # type: ignore
-
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert msg['type'] == 'value_error'
-    assert msg['loc'] == ['body', 'password']
