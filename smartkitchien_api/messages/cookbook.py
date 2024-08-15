@@ -1,7 +1,4 @@
-from pydantic import BaseModel
-
-
-class InformationCookbook(BaseModel):
+class InformationCookbook:
     COOKBOOK_FOUND: dict = {
         'title': 'cookbook Retrieved Successfully',
         'msg': 'The cookbook was retrieved successfully.',

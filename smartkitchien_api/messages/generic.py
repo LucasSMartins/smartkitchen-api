@@ -1,7 +1,4 @@
-from pydantic import BaseModel
-
-
-class InformationGeneric(BaseModel):
+class InformationGeneric:
     ID_MISMATCH: dict = {
         'title': 'ID Mismatch',
         'msg': 'The provided ID does not match the expected value.',
@@ -22,5 +19,5 @@ class InformationGeneric(BaseModel):
     UNAUTHORIZED: dict = {
         'title': 'Unauthorized',
         'msg': 'You are not authorized to perform this action.',
-        'loc': ['', ''],
+        # 'loc': ['', ''],
     }

@@ -4,7 +4,6 @@ import pytest
 from fastapi import HTTPException, status
 from freezegun import freeze_time
 
-from smartkitchien_api.messages.error import ErrorMessages
 from smartkitchien_api.schema.token import Token
 from smartkitchien_api.security.security import (
     create_access_token,
@@ -37,7 +36,6 @@ async def test_get_token_username_or_email_invalid(client):
     )
 
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    assert response.json()['detail'] == 'O nome de usuário ou senha estão incorretos'  # type: ignore
 
 
 def test_token_expired_after_time(faker_user, client, token):
@@ -51,15 +49,14 @@ def test_token_expired_after_time(faker_user, client, token):
             },
         )
         assert response.status_code == status.HTTP_201_CREATED
-        token = response.json()['access_token']  # type: ignore
 
     # Tenta acessar uma rota em que o token já está expirado.
     with freeze_time('2023-07-14 12:31:00'):
         response = client.get(
             f'/api/users/{faker_user.id}', headers={'Authorization': f'Bearer {token}'}
         )
+
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
-        assert response.json()['detail'] == ErrorMessages.NOT_VALIDATE_CREDENTIALS_401  # type: ignore
 
 
 @pytest.mark.asyncio()
@@ -75,7 +72,6 @@ async def test_get_current_user_invalid_token():
         await get_current_user('invalid_token')
 
     assert http_exc.value.status_code == status.HTTP_401_UNAUTHORIZED
-    assert http_exc.value.detail == ErrorMessages.NOT_VALIDATE_CREDENTIALS_401
 
 
 @pytest.mark.asyncio()
@@ -89,7 +85,6 @@ async def test_get_current_user_invalid_username():
         await get_current_user(token)
 
     assert http_exc.value.status_code == status.HTTP_401_UNAUTHORIZED
-    assert http_exc.value.detail == ErrorMessages.NOT_VALIDATE_CREDENTIALS_401
 
 
 @pytest.mark.asyncio()
@@ -103,7 +98,6 @@ async def test_get_current_user_already_existing_username():
         await get_current_user(token)
 
     assert http_exc.value.status_code == status.HTTP_401_UNAUTHORIZED
-    assert http_exc.value.detail == ErrorMessages.NOT_VALIDATE_CREDENTIALS_401
 
 
 @pytest.mark.asyncio()

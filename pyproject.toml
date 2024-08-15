@@ -59,6 +59,9 @@ test = 'pytest -s --cov=smartkitchien_api -vv'
 # O -s mostra as saídas no console, bom para usar print().
 # O --pdb entra em modo DEBBUG
 
+[[tool.mypy.overrides]]
+module = "mongomock_motor"
+ignore_missing_imports = true
 
 [build-system]
 requires = ["poetry-core"]

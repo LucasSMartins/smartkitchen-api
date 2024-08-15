@@ -1,7 +1,4 @@
-from pydantic import BaseModel
-
-
-class InformationPantry(BaseModel):
+class InformationPantry:
     PANTRY_FOUND: dict = {
         'title': 'Pantry Retrieved Successfully',
         'msg': 'The pantry was retrieved successfully.',

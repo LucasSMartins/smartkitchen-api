@@ -3,7 +3,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 
-class TypeAnswers(BaseModel):
+class TypeAnswers:
     SUCCESS: str = 'success'
     BAD_REQUEST: str = 'bad_request'
     NOT_FOUND: str = 'not_found'

@@ -1,7 +1,4 @@
-from pydantic import BaseModel
-
-
-class InformationShoppingCart(BaseModel):
+class InformationShoppingCart:
     CART_FOUND: dict = {
         'title': 'Shopping Cart Retrieved Successfully',
         'msg': 'The shopping cart was retrieved successfully.',

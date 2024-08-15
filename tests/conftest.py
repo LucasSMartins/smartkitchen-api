@@ -1,7 +1,7 @@
-import pytest_asyncio  # type: ignore
+import pytest_asyncio
 from beanie import init_beanie
 from fastapi.testclient import TestClient
-from mongomock_motor import AsyncMongoMockClient  # type: ignore
+from mongomock_motor import AsyncMongoMockClient
 
 from smartkitchien_api.main import app
 from smartkitchien_api.models.cookbook import Cookbook

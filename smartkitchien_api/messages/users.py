@@ -1,7 +1,4 @@
-from pydantic import BaseModel
-
-
-class InformationUsers(BaseModel):
+class InformationUsers:
     USER_DELETED: dict = {
         'title': 'User Deleted',
         'msg': 'The user was successfully deleted.',
