@@ -80,7 +80,7 @@ async def headers(token):
 
 
 @pytest_asyncio.fixture()
-async def create_pantry(client: TestClient, faker_user: FakerUser, headers: dict):
+async def user_pantry(client: TestClient, faker_user: FakerUser, headers: dict):
     category_value = '101'
     item = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
 
@@ -89,3 +89,7 @@ async def create_pantry(client: TestClient, faker_user: FakerUser, headers: dict
         headers=headers,
         json=item,
     )
+
+    pantry = await Pantry.find(Pantry.user_id == faker_user.id).first_or_none()
+
+    return pantry

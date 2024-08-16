@@ -2,8 +2,10 @@ from datetime import timedelta
 
 import pytest
 from fastapi import HTTPException, status
+from fastapi.testclient import TestClient
 from freezegun import freeze_time
 
+from smartkitchien_api.schema.faker_user import FakerUser
 from smartkitchien_api.schema.token import Token
 from smartkitchien_api.security.security import (
     create_access_token,
@@ -13,14 +15,14 @@ from smartkitchien_api.security.security import (
 
 
 @pytest.mark.asyncio()
-async def test_get_token(client, faker_user):
+async def test_get_token(client: TestClient, faker_user: FakerUser):
     response = client.post(
         '/api/token',
-        data={'username': faker_user.username, 'password': 'myS&cret007'},
+        data={'username': faker_user.username, 'password': faker_user.clean_password},
     )
 
-    token = response.json()['access_token']  # type: ignore
-    token_type = response.json()['token_type']  # type: ignore
+    token = response.json()['access_token']
+    token_type = response.json()['token_type']
 
     assert response.status_code == status.HTTP_201_CREATED
     assert token is not None
@@ -38,7 +40,7 @@ async def test_get_token_username_or_email_invalid(client):
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-def test_token_expired_after_time(faker_user, client, token):
+def test_token_expired_after_time(client: TestClient, faker_user: FakerUser):
     # Cria o usuário em um determinado tempo.
     with freeze_time('2023-07-14 12:00:00'):
         response = client.post(
@@ -49,11 +51,13 @@ def test_token_expired_after_time(faker_user, client, token):
             },
         )
         assert response.status_code == status.HTTP_201_CREATED
+        token_that_will_expire = response.json()['access_token']
 
     # Tenta acessar uma rota em que o token já está expirado.
     with freeze_time('2023-07-14 12:31:00'):
         response = client.get(
-            f'/api/users/{faker_user.id}', headers={'Authorization': f'Bearer {token}'}
+            f'/api/users/{faker_user.id}',
+            headers={'Authorization': f'Bearer {token_that_will_expire}'},
         )
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED

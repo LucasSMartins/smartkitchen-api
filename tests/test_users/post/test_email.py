@@ -1,6 +1,8 @@
 import pytest
 from fastapi import status
 
+from smartkitchien_api.models.user import User
+
 
 @pytest.mark.asyncio()
 async def test_email_exist(client):
@@ -20,7 +22,6 @@ async def test_email_exist(client):
 
     # Verifique se a requisição foi bem-sucedida
     assert response.status_code == status.HTTP_409_CONFLICT
-  
 
 
 @pytest.mark.asyncio()
@@ -32,7 +33,6 @@ async def test_required_field_email(client):
     response = client.post('/api/users', json=new_user)
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-
 
 
 @pytest.mark.asyncio()
@@ -59,7 +59,6 @@ async def test_email_validation_with_space(client):
     response = client.post('/api/users', json=new_user)
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-
 
 
 @pytest.mark.asyncio()
