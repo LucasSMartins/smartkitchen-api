@@ -10,6 +10,7 @@ class ShoppingCart(Document):
 
     class Settings:
         name = 'shopping_cart'
+        keep_nulls = False
 
 
 class ShoppingCartPublic(BaseModel):

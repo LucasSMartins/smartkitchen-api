@@ -1,11 +1,12 @@
 import pytest
 from fastapi import status
+from fastapi.testclient import TestClient
 
 from smartkitchien_api.models.user import User
 
 
 @pytest.mark.asyncio()
-async def test_email_exist(client):
+async def test_create_user_returns_409_when_email_already_exists(client: TestClient):
     new_user = {
         'username': 'testuser_email',
         'email': 'testuser@example.com',
@@ -25,7 +26,7 @@ async def test_email_exist(client):
 
 
 @pytest.mark.asyncio()
-async def test_required_field_email(client):
+async def test_create_user_returns_422_when_email_is_missing(client: TestClient):
     new_user = {
         'username': 'testuser',
         'password': 'myS&cret007',
@@ -36,7 +37,7 @@ async def test_required_field_email(client):
 
 
 @pytest.mark.asyncio()
-async def test_email_validation_without_at_sign(client):
+async def test_create_user_returns_422_when_email_lacks_at_sign(client: TestClient):
     new_user = {
         'username': 'testuser',
         'email': 'testuserexample.com',
@@ -49,7 +50,7 @@ async def test_email_validation_without_at_sign(client):
 
 
 @pytest.mark.asyncio()
-async def test_email_validation_with_space(client):
+async def test_create_user_returns_422_when_email_contains_space(client: TestClient):
     new_user = {
         'username': 'testuser',
         'email': 'testuser @example.com',
@@ -62,7 +63,9 @@ async def test_email_validation_with_space(client):
 
 
 @pytest.mark.asyncio()
-async def test_email_validation_with_invalid_character(client):
+async def test_create_user_returns_422_when_email_has_invalid_character(
+    client: TestClient,
+):
     new_user = {
         'username': 'testuser',
         'email': 'testuser@example!.com',
@@ -75,7 +78,7 @@ async def test_email_validation_with_invalid_character(client):
 
 
 @pytest.mark.asyncio()
-async def test_email_validation_without_domain(client):
+async def test_create_user_returns_422_when_email_has_no_domain(client: TestClient):
     new_user = {
         'username': 'testuser',
         'email': 'testuser@',
@@ -88,7 +91,9 @@ async def test_email_validation_without_domain(client):
 
 
 @pytest.mark.asyncio()
-async def test_email_validation_with_invalid_domain(client):
+async def test_create_user_returns_422_when_email_has_invalid_domain(
+    client: TestClient,
+):
     new_user = {
         'username': 'testuser',
         'email': 'testuser@example.invalid',
@@ -101,7 +106,9 @@ async def test_email_validation_with_invalid_domain(client):
 
 
 @pytest.mark.asyncio()
-async def test_email_validation_with_multiple_at(client):
+async def test_create_user_returns_422_when_email_has_multiple_at_signs(
+    client: TestClient,
+):
     new_user = {
         'username': 'testuser',
         'email': 'testuser@example.com@example.com',
@@ -114,7 +121,9 @@ async def test_email_validation_with_multiple_at(client):
 
 
 @pytest.mark.asyncio()
-async def test_email_validation_with_non_allowed_character(client):
+async def test_create_user_returns_422_when_email_contains_non_allowed_character(
+    client: TestClient,
+):
     new_user = {
         'username': 'testuser',
         'email': 'testuser@example.com£',

@@ -80,7 +80,9 @@ async def headers(token):
 
 
 @pytest_asyncio.fixture()
-async def user_pantry(client: TestClient, faker_user: FakerUser, headers: dict):
+async def user_pantry(
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
+):
     category_value = '101'
     item = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
 
@@ -93,3 +95,33 @@ async def user_pantry(client: TestClient, faker_user: FakerUser, headers: dict):
     pantry = await Pantry.find(Pantry.user_id == faker_user.id).first_or_none()
 
     return pantry
+
+
+@pytest_asyncio.fixture()
+async def user_cookbook(
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
+):
+    # Definir os dados da receita conforme solicitado
+    recipe_data = {
+        'name': 'Recipe Example',
+        'preparation_time': '01:30',
+        'ingredients': [
+            {'name': 'string', 'quantity': 'string'},
+            {'name': 'string', 'quantity': 'string'},
+        ],
+        'method_preparation': 'String',
+        'portion': 4,
+    }
+
+    category_value = '101'
+
+    # Fazer a requisição POST para criar uma receita
+    client.post(
+        f'/api/cookbook/{faker_user.id}/category/{category_value}',
+        headers=headers,
+        json=recipe_data,
+    )
+
+    cookbook = await Cookbook.find(Cookbook.user_id == faker_user.id).first_or_none()
+
+    return cookbook

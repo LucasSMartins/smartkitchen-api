@@ -10,6 +10,7 @@ class Pantry(Document):
 
     class Settings:
         name = 'pantry'
+        keep_nulls = False
 
 
 class PantryPublic(BaseModel):

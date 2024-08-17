@@ -104,3 +104,15 @@ user_example = {
     'email': 'testuser@example.com',
     'password': 'myS&cret007',
 }
+
+response_200_example = """
+    Retorna uma lista de usuários no campo data\n
+
+    [\n
+        {\n
+            "username": "lucas",\n
+            "email": "lucas@example.com",\n
+            "created_at": "2024-08-15T23:17:47.761000"\n
+        }\n
+    ]\n
+"""

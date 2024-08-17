@@ -8,7 +8,7 @@ from smartkitchien_api.security.security import verify_password
 
 @pytest.mark.asyncio()
 async def test_update_username_returns_200_when_successful(
-    client: TestClient, faker_user: FakerUser, headers: dict
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
     update_faker_user = {'username': 'new_testuser'}
 
@@ -23,7 +23,7 @@ async def test_update_username_returns_200_when_successful(
 
 @pytest.mark.asyncio()
 async def test_update_email_returns_200_when_successful(
-    client: TestClient, faker_user: FakerUser, headers: dict
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
     update_faker_user = {'email': 'new_testuser@example.com'}
 
@@ -38,7 +38,7 @@ async def test_update_email_returns_200_when_successful(
 
 @pytest.mark.asyncio()
 async def test_update_password_returns_200_when_successful(
-    client: TestClient, faker_user: FakerUser, headers: dict
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
     update_faker_user = {'password': 'newmyS&cret007'}
 
@@ -94,7 +94,7 @@ async def test_update_user_returns_401_when_token_invalid(
 
 @pytest.mark.asyncio()
 async def test_update_username_returns_409_when_username_exists(
-    client: TestClient, faker_user: FakerUser, headers: dict
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
     update_faker_user = {'username': 'testuser'}
 
@@ -107,7 +107,7 @@ async def test_update_username_returns_409_when_username_exists(
 
 @pytest.mark.asyncio()
 async def test_update_email_returns_409_when_email_exists(
-    client: TestClient, faker_user: FakerUser, headers: dict
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
     update_faker_user = {'email': 'testuser@example.com'}
 
@@ -120,12 +120,14 @@ async def test_update_email_returns_409_when_email_exists(
 
 @pytest.mark.asyncio()
 async def test_update_user_returns_422_when_user_id_invalid(
-    client: TestClient, faker_user: FakerUser, headers: dict
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
     update_faker_user = {'password': 'myS&cret007'}
 
+    user_id = '999999'
+
     response = client.put(
-        '/api/users/999999',
+        f'/api/users/{user_id}',
         json=update_faker_user,
         headers=headers,
     )
@@ -135,12 +137,14 @@ async def test_update_user_returns_422_when_user_id_invalid(
 
 @pytest.mark.asyncio()
 async def test_update_user_returns_400_when_user_non_existent(
-    client: TestClient, headers: dict
+    client: TestClient, headers: dict[str, str]
 ):
     update_faker_user = {'password': 'myS&cret007'}
 
+    non_existent_user_id = '5eb7cf5a86d9755df3a6c593'
+
     response = client.put(
-        '/api/users/5eb7cf5a86d9755df3a6c593',
+        f'/api/users/{non_existent_user_id}',
         json=update_faker_user,
         headers=headers,
     )
@@ -150,7 +154,7 @@ async def test_update_user_returns_400_when_user_non_existent(
 
 @pytest.mark.asyncio()
 async def test_update_password_returns_422_when_password_missing(
-    client: TestClient, faker_user: FakerUser, headers: dict
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
     response = client.put(
         f'/api/users/{faker_user.id}',
@@ -162,7 +166,7 @@ async def test_update_password_returns_422_when_password_missing(
 
 @pytest.mark.asyncio()
 async def test_update_password_returns_422_when_password_too_short(
-    client: TestClient, faker_user: FakerUser, headers: dict
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
     update_faker_user = {'password': 'my'}
 
@@ -177,7 +181,7 @@ async def test_update_password_returns_422_when_password_too_short(
 
 @pytest.mark.asyncio()
 async def test_update_password_returns_422_when_missing_uppercase_character(
-    client: TestClient, faker_user: FakerUser, headers: dict
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
     update_faker_user = {'password': 'mysecret'}
 
@@ -192,7 +196,7 @@ async def test_update_password_returns_422_when_missing_uppercase_character(
 
 @pytest.mark.asyncio()
 async def test_update_password_returns_422_when_missing_lowercase_character(
-    client: TestClient, faker_user: FakerUser, headers: dict
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
     update_faker_user = {'password': 'MYS&CRET007'}
 
@@ -207,7 +211,7 @@ async def test_update_password_returns_422_when_missing_lowercase_character(
 
 @pytest.mark.asyncio()
 async def test_update_password_returns_422_when_missing_special_character(
-    client: TestClient, faker_user: FakerUser, headers: dict
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
     update_faker_user = {'password': 'mySecret'}
 
@@ -222,7 +226,7 @@ async def test_update_password_returns_422_when_missing_special_character(
 
 @pytest.mark.asyncio()
 async def test_update_password_returns_422_when_missing_number(
-    client: TestClient, faker_user: FakerUser, headers: dict
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
     update_faker_user = {'password': 'myS&cret'}
 
@@ -237,7 +241,7 @@ async def test_update_password_returns_422_when_missing_number(
 
 @pytest.mark.asyncio()
 async def test_update_username_returns_422_when_contains_invalid_characters(
-    client: TestClient, faker_user: FakerUser, headers: dict
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
     new_username = {'username': 'usert&)st'}
 
@@ -250,7 +254,7 @@ async def test_update_username_returns_422_when_contains_invalid_characters(
 
 @pytest.mark.asyncio()
 async def test_update_username_returns_422_when_contains_excessive_repetition(
-    client: TestClient, faker_user: FakerUser, headers: dict
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
     new_username = {'username': 'uuuuutestuser'}
 

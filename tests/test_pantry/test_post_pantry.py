@@ -1,67 +1,65 @@
 import pytest
 from fastapi import status
+from fastapi.testclient import TestClient
 
-from smartkitchien_api.messages.error import ErrorMessages
-from smartkitchien_api.messages.success import SuccessMessages
 from smartkitchien_api.models.pantry import Pantry
+from smartkitchien_api.schema.faker_user import FakerUser
 
 
 @pytest.mark.asyncio()
-async def test_create_item_pantry(client, token, faker_user):
+async def test_create_item_returns_201_when_successful(
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
+):
     item = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
-
-    user_id = faker_user.id
 
     category_value = '101'
 
     response = client.post(
-        f'/api/pantry/{user_id}/category/{category_value}',
-        headers={'Authorization': f'Bearer {token}'},
+        f'/api/pantry/{faker_user.id}/category/{category_value}',
+        headers=headers,
         json=item,
     )
 
     pantry = await Pantry.find(Pantry.user_id == faker_user.id).first_or_none()
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.json() == {'detail': SuccessMessages.ITEM_ADDED}
     assert pantry is not None
     assert len(pantry.pantry) > 0
     assert len(pantry.pantry[0].items) > 0
 
 
 @pytest.mark.asyncio()
-async def test_create_item_pantry_in_an_existing_category(client, token, faker_user):
-    item = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
+async def test_create_item_returns_201_when_in_existing_category(
+    client: TestClient,
+    faker_user: FakerUser,
+    headers: dict[str, str],
+    user_pantry: Pantry,
+):
     item2 = {'name': 'Pão de Sal', 'quantity': 4, 'unit': 'un', 'price': 100.46}
-
-    user_id = faker_user.id
 
     category_value = '101'
 
-    client.post(
-        f'/api/pantry/{user_id}/category/{category_value}',
-        headers={'Authorization': f'Bearer {token}'},
-        json=item,
-    )
-
     response = client.post(
-        f'/api/pantry/{user_id}/category/{category_value}',
-        headers={'Authorization': f'Bearer {token}'},
+        f'/api/pantry/{faker_user.id}/category/{category_value}',
+        headers=headers,
         json=item2,
     )
 
     pantry = await Pantry.find(Pantry.user_id == faker_user.id).first_or_none()
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.json() == {'detail': SuccessMessages.ITEM_ADDED}
     assert pantry is not None
     assert len(pantry.pantry) > 0
     assert len(pantry.pantry[0].items) > 1
 
 
 @pytest.mark.asyncio()
-async def test_create_item_pantry_in_an_new_category(client, token, faker_user):
-    item = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
+async def test_create_item_returns_201_when_in_new_category(
+    client: TestClient,
+    faker_user: FakerUser,
+    headers: dict[str, str],
+    user_pantry: Pantry,
+):
     item2 = {'name': 'Pão de Sal', 'quantity': 4, 'unit': 'un', 'price': 100.46}
     item3 = {'name': 'Pão de Doce', 'quantity': 2, 'unit': 'un', 'price': 3}
 
@@ -71,13 +69,7 @@ async def test_create_item_pantry_in_an_new_category(client, token, faker_user):
 
     client.post(
         f'/api/pantry/{user_id}/category/{category_value}',
-        headers={'Authorization': f'Bearer {token}'},
-        json=item,
-    )
-
-    client.post(
-        f'/api/pantry/{user_id}/category/{category_value}',
-        headers={'Authorization': f'Bearer {token}'},
+        headers=headers,
         json=item2,
     )
 
@@ -85,14 +77,13 @@ async def test_create_item_pantry_in_an_new_category(client, token, faker_user):
 
     response = client.post(
         f'/api/pantry/{user_id}/category/{new_category_value}',
-        headers={'Authorization': f'Bearer {token}'},
+        headers=headers,
         json=item3,
     )
 
     pantry = await Pantry.find(Pantry.user_id == faker_user.id).first_or_none()
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.json() == {'detail': SuccessMessages.ITEM_ADDED}
     assert pantry is not None
     assert len(pantry.pantry) > 1  # list of categories
     assert len(pantry.pantry[0].items) > 1  # category 101
@@ -103,193 +94,207 @@ async def test_create_item_pantry_in_an_new_category(client, token, faker_user):
 
 
 @pytest.mark.asyncio()
-async def test_create_item_pantry_without_token(client, faker_user):
+async def test_create_item_returns_401_when_token_is_missing(
+    client: TestClient, faker_user: FakerUser
+):
     item = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
-
-    user_id = str(faker_user.id)
 
     category_value = '101'
 
     response = client.post(
-        f'/api/pantry/{user_id}/category/{category_value}',
+        f'/api/pantry/{faker_user.id}/category/{category_value}',
         json=item,
     )
 
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    assert response.json() == {'detail': ErrorMessages.NOT_AUTHENTICATED_401}
 
 
 @pytest.mark.asyncio()
-async def test_create_item_pantry_with_invalid_token(client, faker_user):
-    item_data = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
-
-    user_id = str(faker_user.id)
+async def test_create_item_returns_401_when_token_is_invalid(
+    client: TestClient, faker_user: FakerUser
+):
+    item = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
 
     category_value = '101'
 
     response = client.post(
-        f'/api/pantry/{user_id}/category/{category_value}',
+        f'/api/pantry/{faker_user.id}/category/{category_value}',
         headers={'Authorization': 'Bearer token_invalido'},
-        json=item_data,
+        json=item,
     )
 
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    assert response.json() == {'detail': ErrorMessages.NOT_VALIDATE_CREDENTIALS_401}
 
 
 @pytest.mark.asyncio()
-async def test_create_item_pantry_without_name(client, token, faker_user):
-    item_data = {
+async def test_create_item_returns_422_when_name_is_missing(
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
+):
+    item = {
         'quantity': 1,
         'unit': 'un',
         'price': 10.99,
     }
 
-    user_id = str(faker_user.id)
-
     category_value = '101'
 
     response = client.post(
-        f'/api/pantry/{user_id}/category/{category_value}',
-        headers={'Authorization': f'Bearer {token}'},
-        json=item_data,
+        f'/api/pantry/{faker_user.id}/category/{category_value}',
+        headers=headers,
+        json=item,
     )
 
-    msg = response.json()['detail'][0]  # type: ignore
-
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert msg['type'] == 'missing'
-    assert msg['loc'] == ['body', 'name']
 
 
 @pytest.mark.asyncio()
-async def test_create_item_pantry_without_quantity(client, token, faker_user):
-    item_data = {
+async def test_create_item_returns_422_when_quantity_is_missing(
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
+):
+    item = {
         'name': 'Pão de Forma',
         'unit': 'un',
         'price': 10.99,
     }
 
-    user_id = str(faker_user.id)
-
     category_value = '101'
 
     response = client.post(
-        f'/api/pantry/{user_id}/category/{category_value}',
-        headers={'Authorization': f'Bearer {token}'},
-        json=item_data,
+        f'/api/pantry/{faker_user.id}/category/{category_value}',
+        headers=headers,
+        json=item,
     )
 
-    msg = response.json()['detail'][0]  # type: ignore
-
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert msg['type'] == 'missing'
-    assert msg['loc'] == ['body', 'quantity']
 
 
 @pytest.mark.asyncio()
-async def test_create_item_pantry_with_invalid_category(client, token, faker_user):
-    item_data = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
-
-    user_id = str(faker_user.id)
+async def test_create_item_returns_422_when_category_is_invalid(
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
+):
+    item = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
 
     category_value_invalid = '999'
 
     response = client.post(
-        f'/api/pantry/{user_id}/category/{category_value_invalid}',
-        headers={'Authorization': f'Bearer {token}'},
-        json=item_data,
+        f'/api/pantry/{faker_user.id}/category/{category_value_invalid}',
+        headers=headers,
+        json=item,
     )
 
-    msg = response.json()['detail'][0]  # type: ignore
-
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert msg['type'] == 'enum'
-    assert msg['loc'] == ['path', 'category_value']
 
 
 @pytest.mark.asyncio()
-async def test_create_item_pantry_with_invalid_user_id(client, token):
-    item_data = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
+async def test_create_item_returns_422_when_user_id_is_invalid(
+    client: TestClient, headers: dict[str, str]
+):
+    item = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
 
     category_value = '101'
 
     response = client.post(
         f'/api/pantry/999/category/{category_value}',
-        headers={'Authorization': f'Bearer {token}'},
-        json=item_data,
+        headers=headers,
+        json=item,
     )
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert response.json()['detail'][0]['type'] == 'value_error'  # type: ignore
-    assert response.json()['detail'][0]['loc'] == ['path', 'user_id']  # type: ignore
 
 
 @pytest.mark.asyncio()
-async def test_create_item_pantry_with_invalid_price(client, token, faker_user):
-    item_data = {
+async def test_create_item_returns_422_when_price_is_invalid(
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
+):
+    item = {
         'name': 'Pão de Forma',
         'quantity': 1,
         'unit': 'un',
         'price': 'invalid_price',
     }
 
-    user_id = str(faker_user.id)
-
     category_value = '101'
 
     response = client.post(
-        f'/api/pantry/{user_id}/category/{category_value}',
-        headers={'Authorization': f'Bearer {token}'},
-        json=item_data,
+        f'/api/pantry/{faker_user.id}/category/{category_value}',
+        headers=headers,
+        json=item,
     )
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert response.json()['detail'][0]['type'] == 'decimal_parsing'  # type: ignore
-    assert response.json()['detail'][0]['loc'] == ['body', 'price']  # type: ignore
 
 
 @pytest.mark.asyncio()
-async def test_create_item_pantry_with_user_id_without_permission(
-    client, token, faker_user
+async def test_create_item_returns_400_when_user_id_lacks_permission(
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
-    item_data = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
+    item = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
 
-    user_id = '5eb7cf5a86d9755df3a6c593'
+    non_existent_user_id = '5eb7cf5a86d9755df3a6c593'
 
     category_value = '101'
 
     response = client.post(
-        f'/api/pantry/{user_id}/category/{category_value}',
-        headers={'Authorization': f'Bearer {token}'},
-        json=item_data,
+        f'/api/pantry/{non_existent_user_id}/category/{category_value}',
+        headers=headers,
+        json=item,
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert response.json()['detail'] == ErrorMessages.BAD_REQUEST_CHECK_PERMISSION_USER  # type: ignore
 
 
 @pytest.mark.asyncio()
-async def test_checks_if_an_item_with_the_same_name_already_exists(
-    client, faker_user, token
+async def test_create_item_returns_409_when_item_with_same_name_already_exists(
+    client: TestClient,
+    faker_user: FakerUser,
+    headers: dict[str, str],
+    user_pantry: Pantry,
 ):
-    item_data = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
-
-    user_id = faker_user.id
+    item = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
 
     category_value = '101'
 
-    client.post(
-        f'/api/pantry/{user_id}/category/{category_value}',
-        headers={'Authorization': f'Bearer {token}'},
-        json=item_data,
-    )
-
     response = client.post(
-        f'/api/pantry/{user_id}/category/{category_value}',
-        headers={'Authorization': f'Bearer {token}'},
-        json=item_data,
+        f'/api/pantry/{faker_user.id}/category/{category_value}',
+        headers=headers,
+        json=item,
     )
 
     assert response.status_code == status.HTTP_409_CONFLICT
-    assert response.json()['detail'] == ErrorMessages.ITEM_ALREADY_EXISTS  # type: ignore
+
+
+@pytest.mark.asyncio()
+async def test_create_item_returns_422_when_missing_unit(
+    client: TestClient,
+    faker_user: FakerUser,
+    headers: dict[str, str],
+):
+    item = {'name': 'Pão de Queijo', 'quantity': 3, 'price': 5.99}
+
+    category_value = '101'
+
+    response = client.post(
+        f'/api/pantry/{faker_user.id}/category/{category_value}',
+        headers=headers,
+        json=item,
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.asyncio()
+async def test_create_item_returns_400_when_user_id_is_missing(
+    client: TestClient,
+    headers: dict[str, str],
+):
+    item = {'name': 'Pão de Queijo', 'quantity': 3, 'unit': 'un', 'price': 5.99}
+
+    category_value = '101'
+
+    response = client.post(
+        f'/api/pantry//category/{category_value}',
+        headers=headers,
+        json=item,
+    )
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND

@@ -8,7 +8,10 @@ from smartkitchien_api.schema.faker_user import FakerUser
 
 @pytest.mark.asyncio()
 async def test_delete_item_returns_200_when_successful(
-    client: TestClient, faker_user: FakerUser, headers: dict, user_pantry: Pantry
+    client: TestClient,
+    faker_user: FakerUser,
+    headers: dict[str, str],
+    user_pantry: Pantry,
 ):
     category_value = '101'
     item_id = user_pantry.pantry[0].items[0].id
@@ -26,7 +29,7 @@ async def test_delete_item_returns_200_when_successful(
 
 @pytest.mark.asyncio()
 async def test_delete_item_returns_200_when_ensures_data_integrity_after_deletion(
-    client: TestClient, faker_user: FakerUser, headers: dict
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
     item = {'name': 'Pão de Forma', 'quantity': 1, 'unit': 'un', 'price': 10.99}
     item2 = {'name': 'Pão de Sal', 'quantity': 10, 'unit': 'un', 'price': 1.99}
@@ -87,7 +90,10 @@ async def test_delete_item_returns_200_when_ensures_data_integrity_after_deletio
 # @ =================== TESTES DE ERROR ====================
 @pytest.mark.asyncio()
 async def test_delete_item_returns_422_when_item_id_is_invalid(
-    client: TestClient, faker_user: FakerUser, headers: dict, user_pantry: Pantry
+    client: TestClient,
+    faker_user: FakerUser,
+    headers: dict[str, str],
+    user_pantry: Pantry,
 ):
     category_value = '101'
     invalid_item_id = 'invalid_id'
@@ -102,7 +108,10 @@ async def test_delete_item_returns_422_when_item_id_is_invalid(
 
 @pytest.mark.asyncio()
 async def test_delete_item_returns_404_when_item_id_not_found(
-    client: TestClient, faker_user: FakerUser, headers: dict, user_pantry: Pantry
+    client: TestClient,
+    faker_user: FakerUser,
+    headers: dict[str, str],
+    user_pantry: Pantry,
 ):
     category_value = '101'
     valid_but_nonexistent_item_id = '64b4e13c8c33524b7b47d0f3'
@@ -146,7 +155,10 @@ async def test_delete_item_returns_401_when_token_is_invalid(
 
 @pytest.mark.asyncio()
 async def test_delete_item_returns_422_when_user_id_is_invalid(
-    client: TestClient, faker_user: FakerUser, headers: dict, user_pantry: Pantry
+    client: TestClient,
+    faker_user: FakerUser,
+    headers: dict[str, str],
+    user_pantry: Pantry,
 ):
     invalid_user_id = 'invalid_user_id'
     category_value = '101'
@@ -162,7 +174,10 @@ async def test_delete_item_returns_422_when_user_id_is_invalid(
 
 @pytest.mark.asyncio()
 async def test_delete_item_returns_404_when_user_id_is_missing(
-    client: TestClient, faker_user: FakerUser, headers: dict, user_pantry: Pantry
+    client: TestClient,
+    faker_user: FakerUser,
+    headers: dict[str, str],
+    user_pantry: Pantry,
 ):
     category_value = '101'
     item_id = user_pantry.pantry[0].items[0].id
@@ -177,7 +192,10 @@ async def test_delete_item_returns_404_when_user_id_is_missing(
 
 @pytest.mark.asyncio()
 async def test_delete_item_returns_422_when_category_value_is_invalid(
-    client: TestClient, faker_user: FakerUser, headers: dict, user_pantry: Pantry
+    client: TestClient,
+    faker_user: FakerUser,
+    headers: dict[str, str],
+    user_pantry: Pantry,
 ):
     invalid_category_value = 'invalid_category'
     item_id = user_pantry.pantry[0].items[0].id
@@ -192,7 +210,10 @@ async def test_delete_item_returns_422_when_category_value_is_invalid(
 
 @pytest.mark.asyncio()
 async def test_delete_item_returns_404_when_category_value_is_missing(
-    client: TestClient, faker_user: FakerUser, headers: dict, user_pantry: Pantry
+    client: TestClient,
+    faker_user: FakerUser,
+    headers: dict[str, str],
+    user_pantry: Pantry,
 ):
     item_id = user_pantry.pantry[0].items[0].id
 

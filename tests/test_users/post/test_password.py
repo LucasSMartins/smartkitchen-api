@@ -2,8 +2,9 @@ import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 
+
 @pytest.mark.asyncio()
-async def test_required_field_password(client: Testclient):
+async def test_create_user_returns_422_when_password_is_missing(client: TestClient):
     new_user = {
         'username': 'testuser',
         'email': 'testuser@example.com',
@@ -14,9 +15,8 @@ async def test_required_field_password(client: Testclient):
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-
 @pytest.mark.asyncio()
-async def test_password_validation_lt_8(client: Testclient):
+async def test_create_user_returns_422_when_password_is_too_short(client: TestClient):
     new_user = {
         'username': 'testuser',
         'email': 'testuser@example.com',
@@ -28,10 +28,9 @@ async def test_password_validation_lt_8(client: Testclient):
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-
 @pytest.mark.asyncio()
-async def test_password_validation_must_contain_character_uppercase(
-    client: Testclient
+async def test_create_user_returns_422_when_password_missing_uppercase(
+    client: TestClient,
 ):
     new_user = {
         'username': 'testuser',
@@ -45,8 +44,8 @@ async def test_password_validation_must_contain_character_uppercase(
 
 
 @pytest.mark.asyncio()
-async def test_password_validate_password_must_contain_least_one_lowercase_letter(
-    client: TestClient
+async def test_create_user_returns_422_when_password_missing_lowercase(
+    client: TestClient,
 ):
     new_user = {
         'username': 'testuser',
@@ -60,8 +59,8 @@ async def test_password_validate_password_must_contain_least_one_lowercase_lette
 
 
 @pytest.mark.asyncio()
-async def test_password_validation_must_contain_special_character(
-    client: Testclient
+async def test_create_user_returns_422_when_password_missing_special_character(
+    client: TestClient,
 ):
     new_user = {
         'username': 'testuser',
@@ -75,7 +74,7 @@ async def test_password_validation_must_contain_special_character(
 
 
 @pytest.mark.asyncio()
-async def test_password_validation_must_contain_number(client: Testclient):
+async def test_create_user_returns_422_when_password_missing_number(client: TestClient):
     new_user = {
         'username': 'testuser',
         'email': 'testuser@example.com',

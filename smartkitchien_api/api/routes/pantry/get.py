@@ -20,7 +20,7 @@ router = APIRouter()
 @router.get(
     '/{user_id}',
     status_code=status.HTTP_200_OK,
-    response_model=AnswerDetail,
+    response_model=DefaultAnswer,
 )
 async def read_user_pantry(
     user_id: PydanticObjectId,
@@ -38,19 +38,18 @@ async def read_user_pantry(
         loc=InformationPantry.PANTRY_NOT_FOUND['loc'],
     )
 
-    if user_pantry:
+    if not user_pantry:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=detail_error.model_dump(),
+        )
+    else:
         detail_success = AnswerDetail(
             status=status.HTTP_200_OK,
             type=TypeAnswers.SUCCESS,
             title=InformationPantry.PANTRY_FOUND['title'],
             msg=InformationPantry.PANTRY_FOUND['msg'],
             data=PantryPublic(**user_pantry.model_dump()),
-        )
-
-    if not user_pantry:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail_error.model_dump(),
         )
 
     return DefaultAnswer(detail=detail_success)

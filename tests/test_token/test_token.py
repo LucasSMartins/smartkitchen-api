@@ -31,7 +31,7 @@ async def test_get_token(client: TestClient, faker_user: FakerUser):
 
 
 @pytest.mark.asyncio()
-async def test_get_token_username_or_email_invalid(client):
+async def test_get_token_invalid_username(client: TestClient):
     response = client.post(
         '/api/token',
         data={'username': 'testuser_abcde', 'password': 'myS&cret007_12345'},
@@ -64,7 +64,7 @@ def test_token_expired_after_time(client: TestClient, faker_user: FakerUser):
 
 
 @pytest.mark.asyncio()
-async def test_get_current_user_valid_token(token):
+async def test_get_current_user_valid_token(token: str):
     current_user = await get_current_user(token)
 
     assert current_user.username == 'testuser'
@@ -79,7 +79,7 @@ async def test_get_current_user_invalid_token():
 
 
 @pytest.mark.asyncio()
-async def test_get_current_user_invalid_username():
+async def test_get_current_user_missing_username_in_token():
     # Cria um token sem o payload sub.
     access_token = create_access_token(payload_data={})
 
@@ -92,7 +92,7 @@ async def test_get_current_user_invalid_username():
 
 
 @pytest.mark.asyncio()
-async def test_get_current_user_already_existing_username():
+async def test_get_current_user_non_existing_username():
     # Cria um token sem o payload sub.
     access_token = create_access_token(payload_data={'sub': 'non_existing_testuser'})
 
@@ -105,7 +105,7 @@ async def test_get_current_user_already_existing_username():
 
 
 @pytest.mark.asyncio()
-async def test_get_create_access_token(faker_user):
+async def test_create_access_token(faker_user: FakerUser):
     access_token = create_access_token(
         payload_data={'sub': faker_user.username},
         expires_delta=timedelta(minutes=30),
@@ -115,7 +115,7 @@ async def test_get_create_access_token(faker_user):
 
 
 @pytest.mark.asyncio()
-async def test_validate_jwt_invalid(faker_user):
+async def test_validate_jwt_invalid(faker_user: FakerUser):
     is_valid_jwt = validate_jwt('token_invalid')
 
     assert not is_valid_jwt

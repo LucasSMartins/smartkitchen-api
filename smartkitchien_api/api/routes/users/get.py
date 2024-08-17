@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from smartkitchien_api.messages.users import InformationUsers
 from smartkitchien_api.middleware.check_user_permission import check_user_permission
-from smartkitchien_api.models.user import User, UserPublic
+from smartkitchien_api.models.user import User, UserPublic, response_200_example
 from smartkitchien_api.schema.standard_answer import (
     AnswerDetail,
     DefaultAnswer,
@@ -16,7 +16,12 @@ from smartkitchien_api.security.security import get_current_user
 router = APIRouter()
 
 
-@router.get('/', status_code=status.HTTP_200_OK, response_model=DefaultAnswer)
+@router.get(
+    '/',
+    status_code=status.HTTP_200_OK,
+    response_model=DefaultAnswer,
+    description=response_200_example,
+)
 async def read_users():
     users = await User.find().to_list()
 
@@ -39,6 +44,7 @@ async def read_users():
         type=TypeAnswers.SUCCESS,
         title=InformationUsers.USER_FOUND['title'],
         msg=InformationUsers.USER_FOUND['msg'],
+        data=users,
     )
 
     return DefaultAnswer(detail=detail)

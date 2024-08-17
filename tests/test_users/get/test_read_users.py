@@ -16,7 +16,7 @@ async def test_read_users_returns_200_with_list_of_users_when_successful(
 
 
 @pytest.mark.asyncio()
-async def test_read_users_returns_404_when_no_users_exist(client):
+async def test_read_users_returns_404_when_no_users_exist(client: TestClient):
     # Teste para leitura de todos os usuários quando não existem usuários cadastrados
     response = client.get('/api/users')
 
@@ -25,7 +25,7 @@ async def test_read_users_returns_404_when_no_users_exist(client):
 
 @pytest.mark.asyncio()
 async def test_read_user_me_returns_200_with_current_user_when_successful(
-    client: TestClient, faker_user: FakerUser, headers: dict
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
     # Teste para leitura do usuário atual (me)
     response = client.get('/api/users/me', headers=headers)
@@ -35,7 +35,7 @@ async def test_read_user_me_returns_200_with_current_user_when_successful(
 
 @pytest.mark.asyncio()
 async def test_read_user_by_id_returns_200_with_user_data_when_successful(
-    client: TestClient, faker_user: FakerUser, headers: dict
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
 ):
     # Teste para leitura das informações de um usuário específico pelo ID
 
