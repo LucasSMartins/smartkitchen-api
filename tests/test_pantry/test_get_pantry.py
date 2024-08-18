@@ -3,13 +3,15 @@ from fastapi import status
 from fastapi.testclient import TestClient
 
 from smartkitchien_api.models.pantry import Pantry
-from smartkitchien_api.models.user import User
 from smartkitchien_api.schema.faker_user import FakerUser
 
 
 @pytest.mark.asyncio()
 async def test_get_user_pantry_returns_200_when_authenticated(
-    client: TestClient, faker_user: User, headers: dict[str, str], user_pantry: Pantry
+    client: TestClient,
+    faker_user: FakerUser,
+    headers: dict[str, str],
+    user_pantry: Pantry,
 ):
     response = client.get(f'/api/pantry/{faker_user.id}', headers=headers)
 
@@ -24,7 +26,7 @@ async def test_get_user_pantry_returns_200_when_authenticated(
 
 
 @pytest.mark.asyncio()
-async def test_get_user_pantry_returns_401_when_token_is_missing(
+async def test_get_user_pantry_returns_401_when_unauthenticated(
     client: TestClient, faker_user: FakerUser
 ):
     response = client.get(f'/api/pantry/{faker_user.id}')
@@ -64,3 +66,14 @@ async def test_get_user_pantry_returns_422_when_user_id_is_invalid(
     response = client.get(f'/api/pantry/{invalid_user_id}', headers=headers)
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.asyncio()
+async def test_get_user_pantry_returns_404_when_user_has_no_pantry(
+    client: TestClient,
+    faker_user: FakerUser,
+    headers: dict[str, str],
+):
+    response = client.get(f'/api/pantry/{faker_user.id}', headers=headers)
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND

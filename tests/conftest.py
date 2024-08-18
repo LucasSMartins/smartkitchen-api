@@ -6,11 +6,12 @@ from mongomock_motor import AsyncMongoMockClient
 from smartkitchien_api.main import app
 from smartkitchien_api.models.cookbook import Cookbook
 from smartkitchien_api.models.pantry import Pantry
+from smartkitchien_api.models.shopping_cart import ShoppingCart
 from smartkitchien_api.models.user import User
 from smartkitchien_api.schema.faker_user import FakerUser
 from smartkitchien_api.security.security import get_password_hash
 
-list_document_models = [User, Cookbook, Pantry]
+list_document_models = [User, Cookbook, Pantry, ShoppingCart]
 
 
 @pytest_asyncio.fixture(autouse=True)
@@ -125,3 +126,24 @@ async def user_cookbook(
     cookbook = await Cookbook.find(Cookbook.user_id == faker_user.id).first_or_none()
 
     return cookbook
+
+
+@pytest_asyncio.fixture()
+async def user_shopping_cart(
+    client: TestClient, faker_user: FakerUser, headers: dict[str, str]
+):
+    item_data = {'name': 'Coca-Cola', 'quantity': 2, 'unit': 'l', 'price': 14}
+
+    category_value = '101'
+
+    client.post(
+        f'/api/shopping_cart/{faker_user.id}/category/{category_value}',
+        headers=headers,
+        json=item_data,
+    )
+
+    user_shopping_cart = await ShoppingCart.find(
+        ShoppingCart.user_id == faker_user.id
+    ).first_or_none()
+
+    return user_shopping_cart

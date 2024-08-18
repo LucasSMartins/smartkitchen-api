@@ -27,7 +27,7 @@ router = APIRouter()
 
 
 @router.put(
-    '/{user_id}item/{item_id}/category/{category_value}',
+    '/{user_id}/item/{item_id}/category/{category_value}',
     status_code=status.HTTP_200_OK,
     description=category_description,
     response_model=DefaultAnswer,

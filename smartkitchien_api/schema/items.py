@@ -12,7 +12,7 @@ class Items(BaseModel):
     )
     quantity: int
     unit: Units
-    price: DecimalAnnotation | None = None
+    price: DecimalAnnotation = Field(None, ge=0)
 
 
 class ItemsUpdate(BaseModel):
@@ -22,4 +22,4 @@ class ItemsUpdate(BaseModel):
     )
     quantity: int | None = None
     unit: Units | None = None
-    price: DecimalAnnotation | None = None
+    price: DecimalAnnotation = Field(None, ge=0)

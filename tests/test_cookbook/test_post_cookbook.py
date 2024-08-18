@@ -170,7 +170,7 @@ async def test_create_recipe_returns_401_when_token_is_invalid(
 
 
 @pytest.mark.asyncio()
-async def test_create_recipe_returns_404_when_user_not_found(
+async def test_create_recipe_returns_404_when_the_name_field_is_missing(
     client: TestClient,
     faker_user: FakerUser,
     headers: dict[str, str],
@@ -199,7 +199,7 @@ async def test_create_recipe_returns_404_when_user_not_found(
 
 
 @pytest.mark.asyncio()
-async def test_create_recipe_returns_404_when_category_not_found(
+async def test_create_recipe_returns_404_when__the_ingredients_field_is_missing(
     client: TestClient,
     faker_user: FakerUser,
     headers: dict[str, str],
@@ -257,9 +257,10 @@ async def test_create_recipe_returns_422_when_category_is_invalid(
 @pytest.mark.asyncio()
 async def test_create_recipe_returns_422_when_user_id_is_invalid(
     client: TestClient,
-    faker_user: FakerUser,
     headers: dict[str, str],
 ):
+    user_id = '999'
+
     # Definir os dados da receita conforme solicitado
     recipe_data = {
         'name': 'Recipe Example',
@@ -276,7 +277,7 @@ async def test_create_recipe_returns_422_when_user_id_is_invalid(
 
     # Fazer a requisição POST para criar uma receita com ID de usuário inválido
     response = client.post(
-        f'/api/cookbook/999/category/{category_value}',
+        f'/api/cookbook/{user_id}/category/{category_value}',
         headers=headers,
         json=recipe_data,
     )
