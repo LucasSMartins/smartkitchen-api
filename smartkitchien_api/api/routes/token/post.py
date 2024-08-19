@@ -14,7 +14,7 @@ router = APIRouter()
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=Token)
-async def login_for_acess_token(
+async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
 ):
     # Aqui eu defino se o Login será por e-mail ou por username
