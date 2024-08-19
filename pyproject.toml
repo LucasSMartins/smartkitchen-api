@@ -9,7 +9,6 @@ readme = "README.md"
 python = "3.12.*"
 fastapi = "^0.111.0"
 motor = "^3.4.0"
-pydantic-mongo = "^2.3.0"
 beanie = "^1.26.0"
 pydantic-settings = "^2.3.4"
 pwdlib = { extras = ["argon2"], version = "^0.2.0" }

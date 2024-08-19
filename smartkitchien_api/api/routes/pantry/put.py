@@ -46,16 +46,17 @@ async def update_item_pantry(
     user_pantry = await Pantry.find(Pantry.user_id == user_id).first_or_none()
 
     if not user_pantry:
-        detail = AnswerDetail(
+        detail_error = AnswerDetail(
             status=status.HTTP_404_NOT_FOUND,
             type=TypeAnswers.NOT_FOUND,
             title=InformationPantry.PANTRY_NOT_FOUND['title'],
             msg=InformationPantry.PANTRY_NOT_FOUND['msg'],
             loc=InformationPantry.PANTRY_NOT_FOUND['loc'],
         )
+
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail.model_dump(),
+            detail=detail_error.model_dump(),
         )
 
     category_found = False

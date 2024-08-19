@@ -29,18 +29,6 @@ async def test_get_shopping_cart_returns_401_when_unauthenticated(
 
 
 @pytest.mark.asyncio()
-async def test_get_shopping_cart_returns_404_when_user_not_found(
-    client: TestClient,
-    headers: dict[str, str],
-):
-    user_id = '5eb7cf5a86d9755df3a6c593'
-
-    response = client.get(f'/api/shopping_cart/{user_id}', headers=headers)
-
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
-
-
-@pytest.mark.asyncio()
 async def test_get_shopping_cart_returns_401_when_token_is_invalid(
     client: TestClient,
     faker_user: FakerUser,

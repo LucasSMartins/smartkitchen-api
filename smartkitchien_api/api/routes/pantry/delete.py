@@ -35,7 +35,7 @@ async def delete_item(
     user_pantry = await Pantry.find(Pantry.user_id == user_id).first_or_none()
 
     if not user_pantry:
-        detail = AnswerDetail(
+        detail_error = AnswerDetail(
             status=status.HTTP_404_NOT_FOUND,
             type=TypeAnswers.NOT_FOUND,
             title=InformationPantry.PANTRY_NOT_FOUND['title'],
@@ -44,7 +44,7 @@ async def delete_item(
         )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail.model_dump(),
+            detail=detail_error.model_dump(),
         )
 
     # Procura o item e remove-o da categoria correspondente
@@ -96,11 +96,11 @@ async def delete_item(
     if not user_pantry.pantry:
         await user_pantry.delete()
 
-    detail = AnswerDetail(
+    detail_success = AnswerDetail(
         status=status.HTTP_200_OK,
         type=TypeAnswers.SUCCESS,
         title=InformationPantry.ITEM_DELETED['title'],
         msg=InformationPantry.ITEM_DELETED['msg'],
     )
 
-    return DefaultAnswer(detail=detail)
+    return DefaultAnswer(detail=detail_success)

@@ -1,4 +1,5 @@
 from beanie import Document, PydanticObjectId
+from pydantic import BaseModel
 
 from smartkitchien_api.schema.categories import Categories
 
@@ -9,6 +10,11 @@ class Cookbook(Document):
 
     class Settings:
         name = 'cookbook'
+        keep_nulls = False
+
+
+class CookbookPublic(BaseModel):
+    cookbook: list[Categories]
 
 
 recipe_example = {

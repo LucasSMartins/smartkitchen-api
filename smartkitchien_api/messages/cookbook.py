@@ -31,3 +31,24 @@ class InformationCookbook:
         'title': 'Item deleted',
         'msg': 'Item successfully deleted from the category.',
     }
+
+    ITEM_UPDATED: dict = {
+        'title': 'Item updated',
+        'msg': 'Item successfully updated in the category.',
+    }
+
+    RECIPE_NOT_FOUND: dict = {
+        'title': 'Recipe Not Found',
+        'msg': 'The specified recipe was not found in the cookbook.',
+        'loc': ['path', 'recipe_id'],
+    }
+
+    RECIPE_UPDATED: dict = {
+        'title': 'Recipe Updated',
+        'msg': 'The recipe was successfully updated.',
+    }
+
+    RECIPE_DELETED: dict = {
+        'title': 'Recipe Deleted',
+        'msg': 'The recipe was successfully deleted.',
+    }

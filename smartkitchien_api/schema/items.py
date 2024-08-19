@@ -23,3 +23,11 @@ class ItemsUpdate(BaseModel):
     quantity: int | None = None
     unit: Units | None = None
     price: DecimalAnnotation = Field(None, ge=0)
+
+
+class ItemsUpdateRecipe(BaseModel):
+    name: str
+    preparation_time: str
+    ingredients: list[dict[str, str]]
+    method_preparation: str
+    portion: int

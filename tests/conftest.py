@@ -22,7 +22,7 @@ async def init_mongo():
     )
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture()
 async def client():
     # client = TestClient(app=app, base_url='/api')
     client = TestClient(app=app)
