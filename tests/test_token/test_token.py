@@ -5,9 +5,9 @@ from fastapi import HTTPException, status
 from fastapi.testclient import TestClient
 from freezegun import freeze_time
 
-from smartkitchien_api.schema.faker_user import FakerUser
-from smartkitchien_api.schema.token import Token
-from smartkitchien_api.security.security import (
+from smartkitchen_api.schema.faker_user import FakerUser
+from smartkitchen_api.schema.token import Token
+from smartkitchen_api.security.security import (
     create_access_token,
     get_current_user,
     validate_jwt,

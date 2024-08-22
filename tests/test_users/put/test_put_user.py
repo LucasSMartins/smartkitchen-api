@@ -2,8 +2,8 @@ import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from smartkitchien_api.schema.faker_user import FakerUser
-from smartkitchien_api.security.security import verify_password
+from smartkitchen_api.schema.faker_user import FakerUser
+from smartkitchen_api.security.security import verify_password
 
 
 @pytest.mark.asyncio()

@@ -3,13 +3,13 @@ from beanie import init_beanie
 from fastapi.testclient import TestClient
 from mongomock_motor import AsyncMongoMockClient
 
-from smartkitchien_api.main import app
-from smartkitchien_api.models.cookbook import Cookbook
-from smartkitchien_api.models.pantry import Pantry
-from smartkitchien_api.models.shopping_cart import ShoppingCart
-from smartkitchien_api.models.user import User
-from smartkitchien_api.schema.faker_user import FakerUser
-from smartkitchien_api.security.security import get_password_hash
+from smartkitchen_api.main import app
+from smartkitchen_api.models.cookbook import Cookbook
+from smartkitchen_api.models.pantry import Pantry
+from smartkitchen_api.models.shopping_cart import ShoppingCart
+from smartkitchen_api.models.user import User
+from smartkitchen_api.schema.faker_user import FakerUser
+from smartkitchen_api.security.security import get_password_hash
 
 list_document_models = [User, Cookbook, Pantry, ShoppingCart]
 

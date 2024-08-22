@@ -2,7 +2,7 @@ import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from smartkitchien_api.models.user import User
+from smartkitchen_api.models.user import User
 
 
 @pytest.mark.asyncio()
