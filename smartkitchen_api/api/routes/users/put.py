@@ -33,28 +33,30 @@ async def update_user(
 
     if username_exist:
         if username_exist.username == update_user.username:
-            detail = AnswerDetail(
-                status=status.HTTP_409_CONFLICT,
-                type=TypeAnswers.CONFLICT,
-                title=InformationUsers.USERNAME_ALREADY_EXISTS['title'],
-                msg=InformationUsers.USERNAME_ALREADY_EXISTS['msg'],
-                loc=InformationUsers.USERNAME_ALREADY_EXISTS['loc'],
-            )
+            detail_error = [
+                AnswerDetail(
+                    status=status.HTTP_409_CONFLICT,
+                    type=TypeAnswers.CONFLICT,
+                    title=InformationUsers.USERNAME_ALREADY_EXISTS['title'],
+                    msg=InformationUsers.USERNAME_ALREADY_EXISTS['msg'],
+                    loc=InformationUsers.USERNAME_ALREADY_EXISTS['loc'],
+                ).model_dump(),
+            ]
             raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=detail.model_dump(),
+                status_code=status.HTTP_409_CONFLICT, detail=detail_error
             )
         elif username_exist.email == update_user.email:
-            detail = AnswerDetail(
-                status=status.HTTP_409_CONFLICT,
-                type=TypeAnswers.CONFLICT,
-                title=InformationUsers.EMAIL_ALREADY_EXISTS['title'],
-                msg=InformationUsers.EMAIL_ALREADY_EXISTS['msg'],
-                loc=InformationUsers.EMAIL_ALREADY_EXISTS['loc'],
-            )
+            detail_error = [
+                AnswerDetail(
+                    status=status.HTTP_409_CONFLICT,
+                    type=TypeAnswers.CONFLICT,
+                    title=InformationUsers.EMAIL_ALREADY_EXISTS['title'],
+                    msg=InformationUsers.EMAIL_ALREADY_EXISTS['msg'],
+                    loc=InformationUsers.EMAIL_ALREADY_EXISTS['loc'],
+                ).model_dump(),
+            ]
             raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=detail.model_dump(),
+                status_code=status.HTTP_409_CONFLICT, detail=detail_error
             )
 
     if update_user.password:
@@ -65,11 +67,13 @@ async def update_user(
 
     await current_user.update(Set(update_user_data))
 
-    detail = AnswerDetail(
-        status=status.HTTP_200_OK,
-        type=TypeAnswers.SUCCESS,
-        title=InformationUsers.USER_UPDATED['title'],
-        msg=InformationUsers.USER_UPDATED['msg'],
-    )
+    detail_success = [
+        AnswerDetail(
+            status=status.HTTP_200_OK,
+            type=TypeAnswers.SUCCESS,
+            title=InformationUsers.USER_UPDATED['title'],
+            msg=InformationUsers.USER_UPDATED['msg'],
+        )
+    ]
 
-    return DefaultAnswer(detail=detail)
+    return DefaultAnswer(detail=detail_success)

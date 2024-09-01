@@ -30,39 +30,45 @@ async def create_new_user(
 
     if username_exist:
         if username_exist.username == user.username:
-            detail = AnswerDetail(
-                status=status.HTTP_409_CONFLICT,
-                type=TypeAnswers.CONFLICT,
-                title=InformationUsers.USERNAME_ALREADY_EXISTS['title'],
-                msg=InformationUsers.USERNAME_ALREADY_EXISTS['msg'],
-                loc=InformationUsers.USERNAME_ALREADY_EXISTS['loc'],
-            )
+            detail_error = [
+                AnswerDetail(
+                    status=status.HTTP_409_CONFLICT,
+                    type=TypeAnswers.CONFLICT,
+                    title=InformationUsers.USERNAME_ALREADY_EXISTS['title'],
+                    msg=InformationUsers.USERNAME_ALREADY_EXISTS['msg'],
+                    loc=InformationUsers.USERNAME_ALREADY_EXISTS['loc'],
+                ).model_dump()
+            ]
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=detail.model_dump(),
+                detail=detail_error,
             )
         elif username_exist.email == user.email:
-            detail = AnswerDetail(
-                status=status.HTTP_409_CONFLICT,
-                type=TypeAnswers.CONFLICT,
-                title=InformationUsers.EMAIL_ALREADY_EXISTS['title'],
-                msg=InformationUsers.EMAIL_ALREADY_EXISTS['msg'],
-                loc=InformationUsers.EMAIL_ALREADY_EXISTS['loc'],
-            )
+            detail_error = [
+                AnswerDetail(
+                    status=status.HTTP_409_CONFLICT,
+                    type=TypeAnswers.CONFLICT,
+                    title=InformationUsers.EMAIL_ALREADY_EXISTS['title'],
+                    msg=InformationUsers.EMAIL_ALREADY_EXISTS['msg'],
+                    loc=InformationUsers.EMAIL_ALREADY_EXISTS['loc'],
+                ).model_dump()
+            ]
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=detail.model_dump(),
+                detail=detail_error,
             )
 
     user.password = get_password_hash(user.password)
 
     await user.insert()
 
-    detail = AnswerDetail(
-        status=status.HTTP_201_CREATED,
-        type=TypeAnswers.SUCCESS,
-        title=InformationUsers.USER_CREATED['title'],
-        msg=InformationUsers.USER_CREATED['msg'],
-    )
+    detail_success = [
+        AnswerDetail(
+            status=status.HTTP_201_CREATED,
+            type=TypeAnswers.SUCCESS,
+            title=InformationUsers.USER_CREATED['title'],
+            msg=InformationUsers.USER_CREATED['msg'],
+        )
+    ]
 
-    return DefaultAnswer(detail=detail)
+    return DefaultAnswer(detail=detail_success)

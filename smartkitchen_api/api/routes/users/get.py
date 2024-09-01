@@ -41,13 +41,15 @@ async def read_users():
 
     users_public = [UserPublic(**user.model_dump()) for user in users]
 
-    detail_success = AnswerDetail(
-        status=status.HTTP_200_OK,
-        type=TypeAnswers.SUCCESS,
-        title=InformationUsers.USER_FOUND['title'],
-        msg=InformationUsers.USER_FOUND['msg'],
-        data=users_public,
-    )
+    detail_success = [
+        AnswerDetail(
+            status=status.HTTP_200_OK,
+            type=TypeAnswers.SUCCESS,
+            title=InformationUsers.USER_FOUND['title'],
+            msg=InformationUsers.USER_FOUND['msg'],
+            data=users_public,
+        )
+    ]
 
     return DefaultAnswer(detail=detail_success)
 
@@ -56,13 +58,15 @@ async def read_users():
 async def read_user_me(
     current_user: Annotated[User, Depends(get_current_user)],
 ):
-    detail_success = AnswerDetail(
-        status=status.HTTP_200_OK,
-        type=TypeAnswers.SUCCESS,
-        title=InformationUsers.USER_FOUND['title'],
-        msg=InformationUsers.USER_FOUND['msg'],
-        data=UserPublic(**current_user.model_dump()),
-    )
+    detail_success = [
+        AnswerDetail(
+            status=status.HTTP_200_OK,
+            type=TypeAnswers.SUCCESS,
+            title=InformationUsers.USER_FOUND['title'],
+            msg=InformationUsers.USER_FOUND['msg'],
+            data=UserPublic(**current_user.model_dump()),
+        )
+    ]
 
     return DefaultAnswer(detail=detail_success)
 
@@ -74,12 +78,47 @@ async def read_user(
 ):
     check_user_permission(current_user.id, user_id)
 
-    detail_success = AnswerDetail(
-        status=status.HTTP_200_OK,
-        type=TypeAnswers.SUCCESS,
-        title=InformationUsers.USER_FOUND['title'],
-        msg=InformationUsers.USER_FOUND['msg'],
-        data=UserPublic(**current_user.model_dump()),
-    )
+    detail_success = [
+        AnswerDetail(
+            status=status.HTTP_200_OK,
+            type=TypeAnswers.SUCCESS,
+            title=InformationUsers.USER_FOUND['title'],
+            msg=InformationUsers.USER_FOUND['msg'],
+            data=UserPublic(**current_user.model_dump()),
+        )
+    ]
+
+    return DefaultAnswer(detail=detail_success)
+
+
+@router.get(
+    '/user_exists/', status_code=status.HTTP_200_OK, response_model=DefaultAnswer
+)
+async def user_exists(username: str):
+    user = await User.find_one({'username': username})
+
+    if not user:
+        detail_error = AnswerDetail(
+            status=status.HTTP_404_NOT_FOUND,
+            type=TypeAnswers.NOT_FOUND,
+            title=InformationUsers.USER_NOT_FOUND['title'],
+            msg=InformationUsers.USER_NOT_FOUND['msg'],
+            loc=InformationUsers.USER_NOT_FOUND['loc'],
+        )
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=detail_error.model_dump(),
+        )
+
+    detail_success = [
+        AnswerDetail(
+            status=status.HTTP_200_OK,
+            type=TypeAnswers.SUCCESS,
+            title=InformationUsers.USER_FOUND['title'],
+            msg=InformationUsers.USER_FOUND['msg'],
+            data={**user.model_dump()},
+        )
+    ]
 
     return DefaultAnswer(detail=detail_success)

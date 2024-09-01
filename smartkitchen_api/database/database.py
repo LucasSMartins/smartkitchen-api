@@ -17,7 +17,7 @@ async def init_db():
         client = AsyncIOMotorClient(setting.DATABASE_URI)
         await client.admin.command('ping')  # Verifica se a conexão está ativa
         await init_beanie(
-            database=client.smartkitchien,
+            database=client.smartkitchen,
             document_models=[User, Pantry, ShoppingCart, Cookbook],
         )
     except Exception as e:

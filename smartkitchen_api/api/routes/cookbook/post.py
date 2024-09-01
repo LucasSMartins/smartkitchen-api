@@ -46,16 +46,19 @@ async def add_item_to_list(
 
             return
 
-    detail = AnswerDetail(
-        status=status.HTTP_404_NOT_FOUND,
-        type=TypeAnswers.NOT_FOUND,
-        title=InformationCookbook.CATEGORY_NOT_FOUND['title'],
-        msg=InformationCookbook.CATEGORY_NOT_FOUND['msg'],
-        loc=InformationCookbook.CATEGORY_NOT_FOUND['loc'],
-    )
+    detail_error = [
+        AnswerDetail(
+            status=status.HTTP_404_NOT_FOUND,
+            type=TypeAnswers.NOT_FOUND,
+            title=InformationCookbook.CATEGORY_NOT_FOUND['title'],
+            msg=InformationCookbook.CATEGORY_NOT_FOUND['msg'],
+            loc=InformationCookbook.CATEGORY_NOT_FOUND['loc'],
+        ).model_dump()
+    ]
+
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=detail.model_dump(),
+        detail=detail_error,
     )
 
 
@@ -71,17 +74,18 @@ async def get_collection(current_user_id: PydanticObjectId):
         # TODO: Log ou exiba uma mensagem de erro apropriada
         print(f'Erro ao consultar o banco de dados: {e}')
         # Ou lançar uma exceção personalizada se necessário
-        detail = AnswerDetail(
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            type=TypeAnswers.INTERNAL_SERVER_ERROR,
-            title=InformationGeneric.INTERNAL_SERVER_ERROR['title'],
-            msg=InformationGeneric.INTERNAL_SERVER_ERROR['msg'],
-            loc=InformationGeneric.INTERNAL_SERVER_ERROR['loc'],
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                type=TypeAnswers.INTERNAL_SERVER_ERROR,
+                title=InformationGeneric.INTERNAL_SERVER_ERROR['title'],
+                msg=InformationGeneric.INTERNAL_SERVER_ERROR['msg'],
+                loc=InformationGeneric.INTERNAL_SERVER_ERROR['loc'],
+            ).model_dump()
+        ]
 
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=detail.model_dump(),
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail_error
         )
 
 
@@ -119,11 +123,13 @@ async def create_recipe(
 
         await add_item_to_list(cookbook_collection, category_value, recipe)
 
-    detail = AnswerDetail(
-        status=status.HTTP_201_CREATED,
-        type=TypeAnswers.SUCCESS,
-        title=InformationCookbook.COOKBOOK_CREATED['title'],
-        msg=InformationCookbook.COOKBOOK_CREATED['msg'],
-    )
+    detail_success = [
+        AnswerDetail(
+            status=status.HTTP_201_CREATED,
+            type=TypeAnswers.SUCCESS,
+            title=InformationCookbook.COOKBOOK_CREATED['title'],
+            msg=InformationCookbook.COOKBOOK_CREATED['msg'],
+        )
+    ]
 
-    return DefaultAnswer(detail=detail)
+    return DefaultAnswer(detail=detail_success)

@@ -40,18 +40,17 @@ async def update_item_cookbook(
     user_cookbook = await Cookbook.find(Cookbook.user_id == user_id).first_or_none()
 
     if not user_cookbook:
-        detail_error = AnswerDetail(
-            status=status.HTTP_404_NOT_FOUND,
-            type=TypeAnswers.NOT_FOUND,
-            title=InformationCookbook.COOKBOOK_NOT_FOUND['title'],
-            msg=InformationCookbook.COOKBOOK_NOT_FOUND['msg'],
-            loc=InformationCookbook.COOKBOOK_NOT_FOUND['loc'],
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_404_NOT_FOUND,
+                type=TypeAnswers.NOT_FOUND,
+                title=InformationCookbook.COOKBOOK_NOT_FOUND['title'],
+                msg=InformationCookbook.COOKBOOK_NOT_FOUND['msg'],
+                loc=InformationCookbook.COOKBOOK_NOT_FOUND['loc'],
+            ).model_dump()
+        ]
 
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail_error.model_dump(),
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail_error)
 
     category_found = False
     recipe_found = False
@@ -73,40 +72,46 @@ async def update_item_cookbook(
                 break
 
     if not category_found:
-        detail_error = AnswerDetail(
-            status=status.HTTP_404_NOT_FOUND,
-            type=TypeAnswers.NOT_FOUND,
-            title=InformationCookbook.CATEGORY_NOT_FOUND['title'],
-            msg=InformationCookbook.CATEGORY_NOT_FOUND['msg'],
-            loc=InformationCookbook.CATEGORY_NOT_FOUND['loc'],
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_404_NOT_FOUND,
+                type=TypeAnswers.NOT_FOUND,
+                title=InformationCookbook.CATEGORY_NOT_FOUND['title'],
+                msg=InformationCookbook.CATEGORY_NOT_FOUND['msg'],
+                loc=InformationCookbook.CATEGORY_NOT_FOUND['loc'],
+            ).model_dump()
+        ]
 
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail_error.model_dump(),
+            detail=detail_error,
         )
 
     if not recipe_found:
-        detail_error = AnswerDetail(
-            status=status.HTTP_404_NOT_FOUND,
-            type=TypeAnswers.NOT_FOUND,
-            title=InformationCookbook.RECIPE_NOT_FOUND['title'],
-            msg=InformationCookbook.RECIPE_NOT_FOUND['msg'],
-            loc=InformationCookbook.RECIPE_NOT_FOUND['loc'],
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_404_NOT_FOUND,
+                type=TypeAnswers.NOT_FOUND,
+                title=InformationCookbook.RECIPE_NOT_FOUND['title'],
+                msg=InformationCookbook.RECIPE_NOT_FOUND['msg'],
+                loc=InformationCookbook.RECIPE_NOT_FOUND['loc'],
+            ).model_dump()
+        ]
 
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail_error.model_dump(),
+            detail=detail_error,
         )
 
     await user_cookbook.save()
 
-    detail_success = AnswerDetail(
-        status=status.HTTP_200_OK,
-        type=TypeAnswers.SUCCESS,
-        title=InformationCookbook.RECIPE_UPDATED['title'],
-        msg=InformationCookbook.RECIPE_UPDATED['msg'],
-    )
+    detail_success = [
+        AnswerDetail(
+            status=status.HTTP_200_OK,
+            type=TypeAnswers.SUCCESS,
+            title=InformationCookbook.RECIPE_UPDATED['title'],
+            msg=InformationCookbook.RECIPE_UPDATED['msg'],
+        )
+    ]
 
     return DefaultAnswer(detail=detail_success)

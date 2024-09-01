@@ -49,15 +49,18 @@ async def add_item_to_list(
             # Verifica se já existe um item com o mesmo nome,
             # Se algum valor da lista for verdadeiro (true) a função Any retorna True
             if any(existing_item.name == item.name for existing_item in category.items):
-                detail = AnswerDetail(
-                    status=status.HTTP_409_CONFLICT,
-                    type=TypeAnswers.CONFLICT,
-                    title=InformationPantry.ITEM_ALREADY_EXISTS['title'],
-                    msg=InformationPantry.ITEM_ALREADY_EXISTS['msg'],
-                    loc=InformationPantry.ITEM_ALREADY_EXISTS['loc'],
-                )
+                detail_error = [
+                    AnswerDetail(
+                        status=status.HTTP_409_CONFLICT,
+                        type=TypeAnswers.CONFLICT,
+                        title=InformationPantry.ITEM_ALREADY_EXISTS['title'],
+                        msg=InformationPantry.ITEM_ALREADY_EXISTS['msg'],
+                        loc=InformationPantry.ITEM_ALREADY_EXISTS['loc'],
+                    ).model_dump()
+                ]
+
                 raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT, detail=detail.model_dump()
+                    status_code=status.HTTP_409_CONFLICT, detail=detail_error
                 )
 
             category.items.append(item)
@@ -66,16 +69,19 @@ async def add_item_to_list(
 
             return
 
-    detail = AnswerDetail(
-        status=status.HTTP_404_NOT_FOUND,
-        type=TypeAnswers.NOT_FOUND,
-        title=InformationPantry.CATEGORY_NOT_FOUND['title'],
-        msg=InformationPantry.CATEGORY_NOT_FOUND['msg'],
-        loc=InformationPantry.CATEGORY_NOT_FOUND['loc'],
-    )
+    detail_error = [
+        AnswerDetail(
+            status=status.HTTP_404_NOT_FOUND,
+            type=TypeAnswers.NOT_FOUND,
+            title=InformationPantry.CATEGORY_NOT_FOUND['title'],
+            msg=InformationPantry.CATEGORY_NOT_FOUND['msg'],
+            loc=InformationPantry.CATEGORY_NOT_FOUND['loc'],
+        ).model_dump()
+    ]
+
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=detail.model_dump(),
+        detail=detail_error,
     )
 
 
@@ -92,17 +98,18 @@ async def get_pantry_collection(user_id: PydanticObjectId):
         print(f'Erro ao consultar o banco de dados: {e}')
         # Ou lançar uma exceção personalizada se necessário
 
-        detail = AnswerDetail(
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            type=TypeAnswers.INTERNAL_SERVER_ERROR,
-            title=InformationGeneric.INTERNAL_SERVER_ERROR['title'],
-            msg=InformationGeneric.INTERNAL_SERVER_ERROR['msg'],
-            loc=InformationGeneric.INTERNAL_SERVER_ERROR['loc'],
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                type=TypeAnswers.INTERNAL_SERVER_ERROR,
+                title=InformationGeneric.INTERNAL_SERVER_ERROR['title'],
+                msg=InformationGeneric.INTERNAL_SERVER_ERROR['msg'],
+                loc=InformationGeneric.INTERNAL_SERVER_ERROR['loc'],
+            ).model_dump()
+        ]
 
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=detail.model_dump(),
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail_error
         )
 
 
@@ -143,11 +150,13 @@ async def create_item_pantry(
 
         await add_item_to_list(pantry_collection, category_value, item)
 
-    detail = AnswerDetail(
-        status=status.HTTP_201_CREATED,
-        type=TypeAnswers.SUCCESS,
-        title=InformationPantry.PANTRY_CREATED['title'],
-        msg=InformationPantry.PANTRY_CREATED['msg'],
-    )
+    detail_success = [
+        AnswerDetail(
+            status=status.HTTP_201_CREATED,
+            type=TypeAnswers.SUCCESS,
+            title=InformationPantry.PANTRY_CREATED['title'],
+            msg=InformationPantry.PANTRY_CREATED['msg'],
+        )
+    ]
 
-    return DefaultAnswer(detail=detail)
+    return DefaultAnswer(detail=detail_success)

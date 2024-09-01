@@ -21,15 +21,18 @@ async def login_for_access_token(
     user = await User.find(User.username == form_data.username).first_or_none()
 
     if not user or not verify_password(form_data.password, user.password):
-        detail = AnswerDetail(
-            status=status.HTTP_401_UNAUTHORIZED,
-            type=TypeAnswers.BAD_REQUEST,
-            title=InformationGeneric.INVALID_CREDENTIALS['title'],
-            msg=InformationGeneric.INVALID_CREDENTIALS['msg'],
-        )
+        detail = [
+            AnswerDetail(
+                status=status.HTTP_401_UNAUTHORIZED,
+                type=TypeAnswers.BAD_REQUEST,
+                title=InformationGeneric.INVALID_CREDENTIALS['title'],
+                msg=InformationGeneric.INVALID_CREDENTIALS['msg'],
+            ).model_dump()
+        ]
+
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=detail.model_dump(),
+            detail=detail,
             headers={'WWW-Authenticate': 'Bearer'},
         )
 

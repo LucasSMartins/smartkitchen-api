@@ -40,4 +40,4 @@ class AnswerDetail(BaseModel):
 
 
 class DefaultAnswer(BaseModel):
-    detail: AnswerDetail
+    detail: list[AnswerDetail]

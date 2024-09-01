@@ -29,23 +29,26 @@ async def read_user_shopping_cart(
     ).first_or_none()
 
     if not user_shopping_cart:
-        detail = AnswerDetail(
-            status=status.HTTP_404_NOT_FOUND,
-            type=TypeAnswers.NOT_FOUND,
-            title=InformationShoppingCart.CART_NOT_FOUND['title'],
-            msg=InformationShoppingCart.CART_NOT_FOUND['msg'],
-            loc=InformationShoppingCart.CART_NOT_FOUND['loc'],
-        )
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail.model_dump(),
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_404_NOT_FOUND,
+                type=TypeAnswers.NOT_FOUND,
+                title=InformationShoppingCart.CART_NOT_FOUND['title'],
+                msg=InformationShoppingCart.CART_NOT_FOUND['msg'],
+                loc=InformationShoppingCart.CART_NOT_FOUND['loc'],
+            ).model_dump(),
+        ]
 
-    detail = AnswerDetail(
-        status=status.HTTP_200_OK,
-        type=TypeAnswers.SUCCESS,
-        title=InformationShoppingCart.CART_FOUND['title'],
-        msg=InformationShoppingCart.CART_FOUND['msg'],
-        data=ShoppingCartPublic(**user_shopping_cart.model_dump()),
-    )
-    return DefaultAnswer(detail=detail)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail_error)
+
+    detail_success = [
+        AnswerDetail(
+            status=status.HTTP_200_OK,
+            type=TypeAnswers.SUCCESS,
+            title=InformationShoppingCart.CART_FOUND['title'],
+            msg=InformationShoppingCart.CART_FOUND['msg'],
+            data=ShoppingCartPublic(**user_shopping_cart.model_dump()),
+        )
+    ]
+
+    return DefaultAnswer(detail=detail_success)

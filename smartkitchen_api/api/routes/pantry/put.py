@@ -46,17 +46,19 @@ async def update_item_pantry(
     user_pantry = await Pantry.find(Pantry.user_id == user_id).first_or_none()
 
     if not user_pantry:
-        detail_error = AnswerDetail(
-            status=status.HTTP_404_NOT_FOUND,
-            type=TypeAnswers.NOT_FOUND,
-            title=InformationPantry.PANTRY_NOT_FOUND['title'],
-            msg=InformationPantry.PANTRY_NOT_FOUND['msg'],
-            loc=InformationPantry.PANTRY_NOT_FOUND['loc'],
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_404_NOT_FOUND,
+                type=TypeAnswers.NOT_FOUND,
+                title=InformationPantry.PANTRY_NOT_FOUND['title'],
+                msg=InformationPantry.PANTRY_NOT_FOUND['msg'],
+                loc=InformationPantry.PANTRY_NOT_FOUND['loc'],
+            ).model_dump()
+        ]
 
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail_error.model_dump(),
+            detail=detail_error,
         )
 
     category_found = False
@@ -76,39 +78,44 @@ async def update_item_pantry(
                 break
 
     if not category_found:
-        detail = AnswerDetail(
-            status=status.HTTP_404_NOT_FOUND,
-            type=TypeAnswers.NOT_FOUND,
-            title=InformationPantry.CATEGORY_NOT_FOUND['title'],
-            msg=InformationPantry.CATEGORY_NOT_FOUND['msg'],
-            loc=InformationPantry.CATEGORY_NOT_FOUND['loc'],
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_404_NOT_FOUND,
+                type=TypeAnswers.NOT_FOUND,
+                title=InformationPantry.CATEGORY_NOT_FOUND['title'],
+                msg=InformationPantry.CATEGORY_NOT_FOUND['msg'],
+                loc=InformationPantry.CATEGORY_NOT_FOUND['loc'],
+            ).model_dump()
+        ]
+
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail.model_dump(),
+            detail=detail_error,
         )
 
     if not item_found:
-        detail = AnswerDetail(
-            status=status.HTTP_404_NOT_FOUND,
-            type=TypeAnswers.NOT_FOUND,
-            title=InformationPantry.ITEM_NOT_FOUND['title'],
-            msg=InformationPantry.ITEM_NOT_FOUND['msg'],
-            loc=InformationPantry.ITEM_NOT_FOUND['loc'],
-        )
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail.model_dump(),
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_404_NOT_FOUND,
+                type=TypeAnswers.NOT_FOUND,
+                title=InformationPantry.ITEM_NOT_FOUND['title'],
+                msg=InformationPantry.ITEM_NOT_FOUND['msg'],
+                loc=InformationPantry.ITEM_NOT_FOUND['loc'],
+            ).model_dump()
+        ]
+
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail_error)
 
     await user_pantry.save()
 
-    detail = AnswerDetail(
-        status=status.HTTP_200_OK,
-        type=TypeAnswers.SUCCESS,
-        title=InformationPantry.PANTRY_FOUND['title'],
-        msg=InformationPantry.PANTRY_FOUND['msg'],
-        data=PantryPublic(**user_pantry.model_dump()),
-    )
+    detail_success = [
+        AnswerDetail(
+            status=status.HTTP_200_OK,
+            type=TypeAnswers.SUCCESS,
+            title=InformationPantry.PANTRY_FOUND['title'],
+            msg=InformationPantry.PANTRY_FOUND['msg'],
+            data=PantryPublic(**user_pantry.model_dump()),
+        )
+    ]
 
-    return DefaultAnswer(detail=detail)
+    return DefaultAnswer(detail=detail_success)

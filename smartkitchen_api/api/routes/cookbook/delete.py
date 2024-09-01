@@ -34,16 +34,19 @@ async def delete_user_cookbook(
     user_cookbook = await Cookbook.find(Cookbook.user_id == user_id).first_or_none()
 
     if not user_cookbook:
-        detail_error = AnswerDetail(
-            status=status.HTTP_404_NOT_FOUND,
-            type=TypeAnswers.NOT_FOUND,
-            title=InformationCookbook.CATEGORY_NOT_FOUND['title'],
-            msg=InformationCookbook.CATEGORY_NOT_FOUND['msg'],
-            loc=InformationCookbook.CATEGORY_NOT_FOUND['loc'],
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_404_NOT_FOUND,
+                type=TypeAnswers.NOT_FOUND,
+                title=InformationCookbook.CATEGORY_NOT_FOUND['title'],
+                msg=InformationCookbook.CATEGORY_NOT_FOUND['msg'],
+                loc=InformationCookbook.CATEGORY_NOT_FOUND['loc'],
+            ).model_dump()
+        ]
+
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail_error.model_dump(),
+            detail=detail_error,
         )
 
     # Procura o item e remove-o da categoria correspondente
@@ -59,16 +62,18 @@ async def delete_user_cookbook(
                     break
 
             if not recipe_found:
-                detail_error = AnswerDetail(
-                    status=status.HTTP_404_NOT_FOUND,
-                    type=TypeAnswers.NOT_FOUND,
-                    title=InformationCookbook.RECIPE_NOT_FOUND['title'],
-                    msg=InformationCookbook.RECIPE_NOT_FOUND['msg'],
-                    loc=InformationCookbook.RECIPE_NOT_FOUND['loc'],
-                )
+                detail_error = [
+                    AnswerDetail(
+                        status=status.HTTP_404_NOT_FOUND,
+                        type=TypeAnswers.NOT_FOUND,
+                        title=InformationCookbook.RECIPE_NOT_FOUND['title'],
+                        msg=InformationCookbook.RECIPE_NOT_FOUND['msg'],
+                        loc=InformationCookbook.RECIPE_NOT_FOUND['loc'],
+                    ).model_dump()
+                ]
+
                 raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=detail_error.model_dump(),
+                    status_code=status.HTTP_404_NOT_FOUND, detail=detail_error
                 )
 
             # Remove a categoria se não houver itens
@@ -77,28 +82,30 @@ async def delete_user_cookbook(
             break
 
     if not category_found:
-        detail_error = AnswerDetail(
-            status=status.HTTP_404_NOT_FOUND,
-            type=TypeAnswers.NOT_FOUND,
-            title=InformationCookbook.CATEGORY_NOT_FOUND['title'],
-            msg=InformationCookbook.CATEGORY_NOT_FOUND['msg'],
-            loc=InformationCookbook.CATEGORY_NOT_FOUND['loc'],
-        )
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail_error.model_dump(),
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_404_NOT_FOUND,
+                type=TypeAnswers.NOT_FOUND,
+                title=InformationCookbook.CATEGORY_NOT_FOUND['title'],
+                msg=InformationCookbook.CATEGORY_NOT_FOUND['msg'],
+                loc=InformationCookbook.CATEGORY_NOT_FOUND['loc'],
+            ).model_dump()
+        ]
+
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail_error)
 
     await user_cookbook.save()
 
     if not user_cookbook.cookbook:
         await user_cookbook.delete()
 
-    detail_success = AnswerDetail(
-        status=status.HTTP_200_OK,
-        type=TypeAnswers.SUCCESS,
-        title=InformationCookbook.RECIPE_DELETED['title'],
-        msg=InformationCookbook.RECIPE_DELETED['msg'],
-    )
+    detail_success = [
+        AnswerDetail(
+            status=status.HTTP_200_OK,
+            type=TypeAnswers.SUCCESS,
+            title=InformationCookbook.RECIPE_DELETED['title'],
+            msg=InformationCookbook.RECIPE_DELETED['msg'],
+        )
+    ]
 
     return DefaultAnswer(detail=detail_success)

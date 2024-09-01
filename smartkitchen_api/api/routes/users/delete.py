@@ -27,10 +27,13 @@ async def delete_user(
 
     await current_user.delete()
 
-    detail = AnswerDetail(
-        status=status.HTTP_200_OK,
-        type=TypeAnswers.SUCCESS,
-        title=InformationUsers.USER_DELETED['title'],
-        msg=InformationUsers.USER_DELETED['msg'],
-    )
-    return DefaultAnswer(detail=detail)
+    detail_success = [
+        AnswerDetail(
+            status=status.HTTP_200_OK,
+            type=TypeAnswers.SUCCESS,
+            title=InformationUsers.USER_DELETED['title'],
+            msg=InformationUsers.USER_DELETED['msg'],
+        )
+    ]
+
+    return DefaultAnswer(detail=detail_success)

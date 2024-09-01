@@ -45,17 +45,16 @@ async def update_item_shopping_cart(
     ).first_or_none()
 
     if not user_shopping_cart:
-        detail = AnswerDetail(
-            status=status.HTTP_404_NOT_FOUND,
-            type=TypeAnswers.NOT_FOUND,
-            title=InformationShoppingCart.CART_NOT_FOUND['title'],
-            msg=InformationShoppingCart.CART_NOT_FOUND['msg'],
-            loc=InformationShoppingCart.CART_NOT_FOUND['loc'],
-        )
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail.model_dump(),
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_404_NOT_FOUND,
+                type=TypeAnswers.NOT_FOUND,
+                title=InformationShoppingCart.CART_NOT_FOUND['title'],
+                msg=InformationShoppingCart.CART_NOT_FOUND['msg'],
+                loc=InformationShoppingCart.CART_NOT_FOUND['loc'],
+            ).model_dump(),
+        ]
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail_error)
 
     # Procura o item e atualiza-o na categoria correspondente
     category_found = False
@@ -76,39 +75,47 @@ async def update_item_shopping_cart(
                 break
 
     if not category_found:
-        detail = AnswerDetail(
-            status=status.HTTP_404_NOT_FOUND,
-            type=TypeAnswers.NOT_FOUND,
-            title=InformationShoppingCart.CATEGORY_NOT_FOUND['title'],
-            msg=InformationShoppingCart.CATEGORY_NOT_FOUND['msg'],
-            loc=InformationShoppingCart.CATEGORY_NOT_FOUND['loc'],
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_404_NOT_FOUND,
+                type=TypeAnswers.NOT_FOUND,
+                title=InformationShoppingCart.CATEGORY_NOT_FOUND['title'],
+                msg=InformationShoppingCart.CATEGORY_NOT_FOUND['msg'],
+                loc=InformationShoppingCart.CATEGORY_NOT_FOUND['loc'],
+            ).model_dump()
+        ]
+
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail.model_dump(),
+            detail=detail_error,
         )
 
     if not item_found:
-        detail = AnswerDetail(
-            status=status.HTTP_404_NOT_FOUND,
-            type=TypeAnswers.NOT_FOUND,
-            title=InformationShoppingCart.ITEM_NOT_FOUND['title'],
-            msg=InformationShoppingCart.ITEM_NOT_FOUND['msg'],
-            loc=InformationShoppingCart.ITEM_NOT_FOUND['loc'],
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_404_NOT_FOUND,
+                type=TypeAnswers.NOT_FOUND,
+                title=InformationShoppingCart.ITEM_NOT_FOUND['title'],
+                msg=InformationShoppingCart.ITEM_NOT_FOUND['msg'],
+                loc=InformationShoppingCart.ITEM_NOT_FOUND['loc'],
+            ).model_dump()
+        ]
+
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail.model_dump(),
+            detail=detail_error,
         )
 
     await user_shopping_cart.save()
 
-    detail = AnswerDetail(
-        status=status.HTTP_200_OK,
-        type=TypeAnswers.SUCCESS,
-        title=InformationShoppingCart.ITEM_UPDATED['title'],
-        msg=InformationShoppingCart.ITEM_UPDATED['msg'],
-        data=ShoppingCartPublic(**user_shopping_cart.model_dump()),
-    )
+    detail_success = [
+        AnswerDetail(
+            status=status.HTTP_200_OK,
+            type=TypeAnswers.SUCCESS,
+            title=InformationShoppingCart.ITEM_UPDATED['title'],
+            msg=InformationShoppingCart.ITEM_UPDATED['msg'],
+            data=ShoppingCartPublic(**user_shopping_cart.model_dump()),
+        )
+    ]
 
-    return DefaultAnswer(detail=detail)
+    return DefaultAnswer(detail=detail_success)

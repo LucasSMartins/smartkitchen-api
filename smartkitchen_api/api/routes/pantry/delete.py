@@ -35,17 +35,17 @@ async def delete_item(
     user_pantry = await Pantry.find(Pantry.user_id == user_id).first_or_none()
 
     if not user_pantry:
-        detail_error = AnswerDetail(
-            status=status.HTTP_404_NOT_FOUND,
-            type=TypeAnswers.NOT_FOUND,
-            title=InformationPantry.PANTRY_NOT_FOUND['title'],
-            msg=InformationPantry.PANTRY_NOT_FOUND['msg'],
-            loc=InformationPantry.PANTRY_NOT_FOUND['loc'],
-        )
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail_error.model_dump(),
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_404_NOT_FOUND,
+                type=TypeAnswers.NOT_FOUND,
+                title=InformationPantry.PANTRY_NOT_FOUND['title'],
+                msg=InformationPantry.PANTRY_NOT_FOUND['msg'],
+                loc=InformationPantry.PANTRY_NOT_FOUND['loc'],
+            ).model_dump()
+        ]
+
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail_error)
 
     # Procura o item e remove-o da categoria correspondente
     category_found = False
@@ -60,16 +60,18 @@ async def delete_item(
                     break
 
             if not item_found:
-                detail = AnswerDetail(
-                    status=status.HTTP_404_NOT_FOUND,
-                    type=TypeAnswers.NOT_FOUND,
-                    title=InformationPantry.ITEM_NOT_FOUND['title'],
-                    msg=InformationPantry.ITEM_NOT_FOUND['msg'],
-                    loc=InformationPantry.ITEM_NOT_FOUND['loc'],
-                )
+                detail_error = [
+                    AnswerDetail(
+                        status=status.HTTP_404_NOT_FOUND,
+                        type=TypeAnswers.NOT_FOUND,
+                        title=InformationPantry.ITEM_NOT_FOUND['title'],
+                        msg=InformationPantry.ITEM_NOT_FOUND['msg'],
+                        loc=InformationPantry.ITEM_NOT_FOUND['loc'],
+                    ).model_dump()
+                ]
+
                 raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=detail.model_dump(),
+                    status_code=status.HTTP_404_NOT_FOUND, detail=detail_error
                 )
 
             # Remove a categoria se não houver itens
@@ -78,17 +80,17 @@ async def delete_item(
             break
 
     if not category_found:
-        detail = AnswerDetail(
-            status=status.HTTP_404_NOT_FOUND,
-            type=TypeAnswers.NOT_FOUND,
-            title=InformationPantry.CATEGORY_NOT_FOUND['title'],
-            msg=InformationPantry.CATEGORY_NOT_FOUND['msg'],
-            loc=InformationPantry.CATEGORY_NOT_FOUND['loc'],
-        )
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail.model_dump(),
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_404_NOT_FOUND,
+                type=TypeAnswers.NOT_FOUND,
+                title=InformationPantry.CATEGORY_NOT_FOUND['title'],
+                msg=InformationPantry.CATEGORY_NOT_FOUND['msg'],
+                loc=InformationPantry.CATEGORY_NOT_FOUND['loc'],
+            ).model_dump()
+        ]
+
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail_error)
 
     # Salva e se a dispensa estiver vazia o exclui.
     await user_pantry.save()
@@ -96,11 +98,13 @@ async def delete_item(
     if not user_pantry.pantry:
         await user_pantry.delete()
 
-    detail_success = AnswerDetail(
-        status=status.HTTP_200_OK,
-        type=TypeAnswers.SUCCESS,
-        title=InformationPantry.ITEM_DELETED['title'],
-        msg=InformationPantry.ITEM_DELETED['msg'],
-    )
+    detail_success = [
+        AnswerDetail(
+            status=status.HTTP_200_OK,
+            type=TypeAnswers.SUCCESS,
+            title=InformationPantry.ITEM_DELETED['title'],
+            msg=InformationPantry.ITEM_DELETED['msg'],
+        )
+    ]
 
     return DefaultAnswer(detail=detail_success)

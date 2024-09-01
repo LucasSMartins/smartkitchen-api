@@ -35,17 +35,16 @@ async def delete_item(
     ).first_or_none()
 
     if not user_shopping_cart:
-        detail = AnswerDetail(
-            status=status.HTTP_404_NOT_FOUND,
-            type=TypeAnswers.NOT_FOUND,
-            title=InformationShoppingCart.CART_NOT_FOUND['title'],
-            msg=InformationShoppingCart.CART_NOT_FOUND['msg'],
-            loc=InformationShoppingCart.CART_NOT_FOUND['loc'],
-        )
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail.model_dump(),
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_404_NOT_FOUND,
+                type=TypeAnswers.NOT_FOUND,
+                title=InformationShoppingCart.CART_NOT_FOUND['title'],
+                msg=InformationShoppingCart.CART_NOT_FOUND['msg'],
+                loc=InformationShoppingCart.CART_NOT_FOUND['loc'],
+            ).model_dump(),
+        ]
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail_error)
 
     # Procura o item e remove-o da categoria correspondente
     category_found = False
@@ -60,16 +59,18 @@ async def delete_item(
                     break
 
             if not item_found:
-                detail = AnswerDetail(
-                    status=status.HTTP_404_NOT_FOUND,
-                    type=TypeAnswers.NOT_FOUND,
-                    title=InformationShoppingCart.ITEM_NOT_FOUND['title'],
-                    msg=InformationShoppingCart.ITEM_NOT_FOUND['msg'],
-                    loc=InformationShoppingCart.ITEM_NOT_FOUND['loc'],
-                )
+                detail_error = [
+                    AnswerDetail(
+                        status=status.HTTP_404_NOT_FOUND,
+                        type=TypeAnswers.NOT_FOUND,
+                        title=InformationShoppingCart.ITEM_NOT_FOUND['title'],
+                        msg=InformationShoppingCart.ITEM_NOT_FOUND['msg'],
+                        loc=InformationShoppingCart.ITEM_NOT_FOUND['loc'],
+                    ).model_dump(),
+                ]
+
                 raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=detail.model_dump(),
+                    status_code=status.HTTP_404_NOT_FOUND, detail=detail_error
                 )
 
             # Remove a categoria se não houver itens
@@ -78,17 +79,17 @@ async def delete_item(
             break
 
     if not category_found:
-        detail = AnswerDetail(
-            status=status.HTTP_404_NOT_FOUND,
-            type=TypeAnswers.NOT_FOUND,
-            title=InformationShoppingCart.CATEGORY_NOT_FOUND['title'],
-            msg=InformationShoppingCart.CATEGORY_NOT_FOUND['msg'],
-            loc=InformationShoppingCart.CATEGORY_NOT_FOUND['loc'],
-        )
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail.model_dump(),
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_404_NOT_FOUND,
+                type=TypeAnswers.NOT_FOUND,
+                title=InformationShoppingCart.CATEGORY_NOT_FOUND['title'],
+                msg=InformationShoppingCart.CATEGORY_NOT_FOUND['msg'],
+                loc=InformationShoppingCart.CATEGORY_NOT_FOUND['loc'],
+            ).model_dump(),
+        ]
+
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail_error)
 
     # Salva e, se necessário, exclui o carrinho de compras
     await user_shopping_cart.save()
@@ -96,11 +97,13 @@ async def delete_item(
     if not user_shopping_cart.shopping_cart:
         await user_shopping_cart.delete()
 
-    detail = AnswerDetail(
-        status=status.HTTP_200_OK,
-        type=TypeAnswers.SUCCESS,
-        title=InformationShoppingCart.ITEM_DELETED['title'],
-        msg=InformationShoppingCart.ITEM_DELETED['msg'],
-    )
+    detail_success = [
+        AnswerDetail(
+            status=status.HTTP_200_OK,
+            type=TypeAnswers.SUCCESS,
+            title=InformationShoppingCart.ITEM_DELETED['title'],
+            msg=InformationShoppingCart.ITEM_DELETED['msg'],
+        )
+    ]
 
-    return DefaultAnswer(detail=detail)
+    return DefaultAnswer(detail=detail_success)

@@ -6,7 +6,6 @@ from fastapi import HTTPException, Path, status
 from smartkitchen_api.messages.users import InformationUsers
 from smartkitchen_api.schema.standard_answer import (
     AnswerDetail,
-    DefaultAnswer,
     TypeAnswers,
 )
 
@@ -29,17 +28,18 @@ def validate_object_id(
     ],
 ):
     if not ObjectId.is_valid(user_id):
-        detail_error = AnswerDetail(
-            status=status.HTTP_400_BAD_REQUEST,
-            type=TypeAnswers.BAD_REQUEST,
-            title=InformationUsers.INVALID_USER_ID['title'],
-            msg=InformationUsers.INVALID_USER_ID['msg'],
-            loc=InformationUsers.INVALID_USER_ID['loc'],
-        )
+        detail_error = [
+            AnswerDetail(
+                status=status.HTTP_400_BAD_REQUEST,
+                type=TypeAnswers.BAD_REQUEST,
+                title=InformationUsers.INVALID_USER_ID['title'],
+                msg=InformationUsers.INVALID_USER_ID['msg'],
+                loc=InformationUsers.INVALID_USER_ID['loc'],
+            ).model_dump()
+        ]
 
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=DefaultAnswer(detail=detail_error),
+            status_code=status.HTTP_400_BAD_REQUEST, detail=detail_error
         )
 
     return user_id

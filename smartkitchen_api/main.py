@@ -45,10 +45,7 @@ async def read_root():
             <h1>SmartKitchen</h1>
             <p>Welcome to SmartKitchen!</p>
             <p>
-              <a href="
-                http://127.0.0.1:8000/docs
-                ">Click here
-              </a> for more information about the documentation.
+              Click here for more information about the documentation.
             </p>
         </body>
     </html>
